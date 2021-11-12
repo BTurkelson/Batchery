@@ -33,6 +33,7 @@ namespace Batchery
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.mainTabControl = new System.Windows.Forms.TabControl();
             this.outputTab = new System.Windows.Forms.TabPage();
+            this.textProgressBar = new ProgressBarSample.TextProgressBar();
             this.cancelButton = new System.Windows.Forms.Button();
             this.outputTabControl = new System.Windows.Forms.TabControl();
             this.stdOutTab = new System.Windows.Forms.TabPage();
@@ -97,6 +98,7 @@ namespace Batchery
             // 
             this.outputTab.BackColor = System.Drawing.Color.WhiteSmoke;
             this.outputTab.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.outputTab.Controls.Add(this.textProgressBar);
             this.outputTab.Controls.Add(this.cancelButton);
             this.outputTab.Controls.Add(this.outputTabControl);
             this.outputTab.Controls.Add(this.runButton);
@@ -107,13 +109,27 @@ namespace Batchery
             this.outputTab.TabIndex = 0;
             this.outputTab.Text = "Output";
             // 
+            // textProgressBar
+            // 
+            this.textProgressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textProgressBar.CustomText = "";
+            this.textProgressBar.Location = new System.Drawing.Point(6, 59);
+            this.textProgressBar.Name = "textProgressBar";
+            this.textProgressBar.ProgressColor = System.Drawing.Color.LightGreen;
+            this.textProgressBar.Size = new System.Drawing.Size(678, 23);
+            this.textProgressBar.TabIndex = 4;
+            this.textProgressBar.TextColor = System.Drawing.SystemColors.ControlText;
+            this.textProgressBar.TextFont = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.textProgressBar.VisualMode = ProgressBarSample.ProgressBarDisplayMode.CustomText;
+            // 
             // cancelButton
             // 
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.Enabled = false;
             this.cancelButton.Location = new System.Drawing.Point(690, 7);
             this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(64, 45);
+            this.cancelButton.Size = new System.Drawing.Size(64, 75);
             this.cancelButton.TabIndex = 3;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
@@ -127,11 +143,11 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Right)));
             this.outputTabControl.Controls.Add(this.stdOutTab);
             this.outputTabControl.Controls.Add(this.stdErrTab);
-            this.outputTabControl.Location = new System.Drawing.Point(6, 59);
+            this.outputTabControl.Location = new System.Drawing.Point(6, 88);
             this.outputTabControl.Multiline = true;
             this.outputTabControl.Name = "outputTabControl";
             this.outputTabControl.SelectedIndex = 0;
-            this.outputTabControl.Size = new System.Drawing.Size(752, 329);
+            this.outputTabControl.Size = new System.Drawing.Size(752, 300);
             this.outputTabControl.TabIndex = 2;
             this.outputTabControl.Selected += new System.Windows.Forms.TabControlEventHandler(this.OutputControl1_Selected);
             // 
@@ -141,7 +157,7 @@ namespace Batchery
             this.stdOutTab.Location = new System.Drawing.Point(4, 4);
             this.stdOutTab.Name = "stdOutTab";
             this.stdOutTab.Padding = new System.Windows.Forms.Padding(3);
-            this.stdOutTab.Size = new System.Drawing.Size(744, 301);
+            this.stdOutTab.Size = new System.Drawing.Size(744, 272);
             this.stdOutTab.TabIndex = 0;
             this.stdOutTab.Text = "StdOut";
             this.stdOutTab.UseVisualStyleBackColor = true;
@@ -159,7 +175,7 @@ namespace Batchery
             this.stdTextBox.Name = "stdTextBox";
             this.stdTextBox.ReadOnly = true;
             this.stdTextBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.stdTextBox.Size = new System.Drawing.Size(741, 298);
+            this.stdTextBox.Size = new System.Drawing.Size(741, 269);
             this.stdTextBox.TabIndex = 1;
             this.stdTextBox.Text = "";
             // 
@@ -206,7 +222,7 @@ namespace Batchery
             this.stdErrTab.Location = new System.Drawing.Point(4, 4);
             this.stdErrTab.Name = "stdErrTab";
             this.stdErrTab.Padding = new System.Windows.Forms.Padding(3);
-            this.stdErrTab.Size = new System.Drawing.Size(744, 301);
+            this.stdErrTab.Size = new System.Drawing.Size(744, 272);
             this.stdErrTab.TabIndex = 1;
             this.stdErrTab.Text = "StdErr";
             this.stdErrTab.UseVisualStyleBackColor = true;
@@ -224,7 +240,7 @@ namespace Batchery
             this.errTextBox.Name = "errTextBox";
             this.errTextBox.ReadOnly = true;
             this.errTextBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.errTextBox.Size = new System.Drawing.Size(741, 298);
+            this.errTextBox.Size = new System.Drawing.Size(741, 269);
             this.errTextBox.TabIndex = 2;
             this.errTextBox.Text = "";
             // 
@@ -272,7 +288,7 @@ namespace Batchery
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(738, 33);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(729, 33);
             this.tableLayoutPanel2.TabIndex = 2;
             // 
             // addButton
@@ -282,7 +298,7 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Right)));
             this.addButton.Location = new System.Drawing.Point(3, 3);
             this.addButton.Name = "addButton";
-            this.addButton.Size = new System.Drawing.Size(239, 27);
+            this.addButton.Size = new System.Drawing.Size(236, 27);
             this.addButton.TabIndex = 0;
             this.addButton.Text = "Add";
             this.addButton.UseVisualStyleBackColor = true;
@@ -294,9 +310,9 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.removeButton.Enabled = false;
-            this.removeButton.Location = new System.Drawing.Point(248, 3);
+            this.removeButton.Location = new System.Drawing.Point(245, 3);
             this.removeButton.Name = "removeButton";
-            this.removeButton.Size = new System.Drawing.Size(240, 27);
+            this.removeButton.Size = new System.Drawing.Size(237, 27);
             this.removeButton.TabIndex = 1;
             this.removeButton.Text = "Remove";
             this.removeButton.UseVisualStyleBackColor = true;
@@ -308,9 +324,9 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.editButton.Enabled = false;
-            this.editButton.Location = new System.Drawing.Point(494, 3);
+            this.editButton.Location = new System.Drawing.Point(488, 3);
             this.editButton.Name = "editButton";
-            this.editButton.Size = new System.Drawing.Size(241, 27);
+            this.editButton.Size = new System.Drawing.Size(238, 27);
             this.editButton.TabIndex = 2;
             this.editButton.Text = "Edit in Notepad";
             this.editButton.UseVisualStyleBackColor = true;
@@ -527,6 +543,7 @@ namespace Batchery
         private System.Windows.Forms.ToolStripMenuItem moveDownToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem editInNotepadToolStripMenuItem;
+        private ProgressBarSample.TextProgressBar textProgressBar;
     }
 }
 

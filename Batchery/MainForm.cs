@@ -51,7 +51,10 @@ namespace Batchery
             // Disable editing of batch files during a run.
             mainTabControl.TabPages[1].Enabled = false;
 
-            m_batchManager.OnRun(onBatchRunEnd, onStdOutRecieved, onStdErrRecieved);
+            textProgressBar.Value = 0;
+            textProgressBar.ProgressColor = System.Drawing.Color.LightGreen;
+
+            m_batchManager.OnRun(onBatchRunEnd, onBatchRunFile, onStdOutRecieved, onStdErrRecieved);
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
@@ -68,10 +71,37 @@ namespace Batchery
             }
             else
             {
+                if (exitCode == 0)
+                {
+                    textProgressBar.Value = 0;
+                    textProgressBar.ProgressColor = System.Drawing.Color.LightGreen;
+                    textProgressBar.CustomText = "";
+                }
+                else
+                {
+                    textProgressBar.Maximum = 1;
+                    textProgressBar.Value = 1;
+                    textProgressBar.ProgressColor = System.Drawing.Color.LightCoral;
+                }
+
                 System.Media.SystemSounds.Beep.Play();
                 cancelButton.Enabled = false;
                 runButton.Enabled = true;
                 mainTabControl.TabPages[1].Enabled = true;
+            }
+        }
+
+        private void onBatchRunFile(string file, int stepIdx, int numSteps)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<string, int, int>(onBatchRunFile), file, stepIdx, numSteps);
+            }
+            else
+            {
+                textProgressBar.CustomText = "(" + stepIdx.ToString() + "/" + numSteps.ToString() + ") " + file;
+                textProgressBar.Value = stepIdx;
+                textProgressBar.Maximum = numSteps;
             }
         }
 
