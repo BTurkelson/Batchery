@@ -11,6 +11,9 @@ namespace Batchery
         public delegate void OnEndCallback(int exitCode);
         private OnEndCallback m_onEndCallback;
 
+        public delegate void OnRunFileCallback(string fileName, int stepIdx, int numSteps);
+        private OnRunFileCallback m_onRunFileCallback;
+
         public delegate void OnTextRecievedCallback(string text);
         private OnTextRecievedCallback m_onStdOutRecievedCallback;
         private OnTextRecievedCallback m_onStdErrRecievedCallback;
@@ -21,20 +24,27 @@ namespace Batchery
         private Queue<string> m_BatchFiles = new Queue<string>();
         private System.Diagnostics.Process m_BatchProcess;
 
+        private int m_stepIdx = 0;
+        private int m_numSteps = 0;
+
         public BatchManager(System.Windows.Forms.CheckedListBox listBox)
         {
             m_listBox = listBox;
         }
 
-        public void OnRun(OnEndCallback callback, OnTextRecievedCallback stdOutCallback, OnTextRecievedCallback stdErrCallback)
+        public void OnRun(OnEndCallback onEnd, OnRunFileCallback onRunFile, OnTextRecievedCallback stdOutCallback, OnTextRecievedCallback stdErrCallback)
         {
-            m_onEndCallback = callback;
+            m_onEndCallback = onEnd;
+            m_onRunFileCallback = onRunFile;
             m_onStdOutRecievedCallback = stdOutCallback;
             m_onStdErrRecievedCallback = stdErrCallback;
             
             if (m_listBox.CheckedItems.Count > 0)
             {
                 m_BatchFiles.Clear();
+
+                m_numSteps = m_listBox.CheckedItems.Count;
+                m_stepIdx = 0;
 
                 foreach (string file in m_listBox.CheckedItems)
                 {
@@ -61,12 +71,18 @@ namespace Batchery
             {
                 WriteTextBox("Nothing to do!");
 
-                m_onEndCallback = null;
-                m_onStdOutRecievedCallback = null;
-                m_onStdErrRecievedCallback = null;
+                ClearCallbacks();
 
-                callback(-1);
+                onEnd(-1);
             }
+        }
+
+        private void ClearCallbacks()
+        {
+            m_onEndCallback = null;
+            m_onRunFileCallback = null;
+            m_onStdOutRecievedCallback = null;
+            m_onStdErrRecievedCallback = null;
         }
 
         private void RunNext()
@@ -77,6 +93,9 @@ namespace Batchery
 
             m_BatchProcess.StartInfo.FileName = file;
             m_BatchProcess.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(file);
+
+            m_stepIdx++;
+            m_onRunFileCallback(file, m_stepIdx, m_numSteps);
 
             try
             {
@@ -92,9 +111,7 @@ namespace Batchery
                 if (m_onEndCallback != null)
                 {
                     OnEndCallback temp = m_onEndCallback;
-                    m_onEndCallback = null;
-                    m_onStdOutRecievedCallback = null;
-                    m_onStdErrRecievedCallback = null;
+                    ClearCallbacks();
                     temp(-1);
                 }
             }
@@ -129,9 +146,7 @@ namespace Batchery
             if ((endNow == true) && (m_onEndCallback != null))
             {
                 OnEndCallback temp = m_onEndCallback;
-                m_onEndCallback = null;
-                m_onStdOutRecievedCallback = null;
-                m_onStdErrRecievedCallback = null;
+                ClearCallbacks();
                 temp(exitCode);
             }
         }

@@ -1,0 +1,3 @@
+[submodule "Batchery/TextProgressBar"]
+	path = Batchery/TextProgressBar
+	url = https://github.com/ukushu/TextProgressBar
