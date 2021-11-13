@@ -27,7 +27,7 @@ namespace Batchery
         {
             InitializeComponent();
 
-            byte[] fontData = Properties.Resources.RobotoMono_Regular;
+            byte[] fontData = Properties.Resources.Hack_Regular;
             IntPtr fontPtr = System.Runtime.InteropServices.Marshal.AllocCoTaskMem(fontData.Length);
             System.Runtime.InteropServices.Marshal.Copy(fontData, 0, fontPtr, fontData.Length);
             uint dummy = 0;
@@ -53,6 +53,7 @@ namespace Batchery
 
             textProgressBar.Value = 0;
             textProgressBar.ProgressColor = System.Drawing.Color.LightGreen;
+            textProgressBar.Invalidate();
 
             m_batchManager.OnRun(onBatchRunEnd, onBatchRunFile, onStdOutRecieved, onStdErrRecieved);
         }
@@ -76,12 +77,14 @@ namespace Batchery
                     textProgressBar.Value = 0;
                     textProgressBar.ProgressColor = System.Drawing.Color.LightGreen;
                     textProgressBar.CustomText = "";
+                    textProgressBar.Invalidate();
                 }
                 else
                 {
                     textProgressBar.Maximum = 1;
                     textProgressBar.Value = 1;
                     textProgressBar.ProgressColor = System.Drawing.Color.LightCoral;
+                    textProgressBar.Invalidate();
                 }
 
                 System.Media.SystemSounds.Beep.Play();

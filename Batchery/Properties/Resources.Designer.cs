@@ -61,22 +61,22 @@ namespace Batchery.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Hack_Regular {
+            get {
+                object obj = ResourceManager.GetObject("Hack_Regular", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon muffin {
             get {
                 object obj = ResourceManager.GetObject("muffin", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] RobotoMono_Regular {
-            get {
-                object obj = ResourceManager.GetObject("RobotoMono_Regular", resourceCulture);
-                return ((byte[])(obj));
             }
         }
         
