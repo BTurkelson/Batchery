@@ -69,7 +69,7 @@ namespace Batchery
             }
             else
             {
-                WriteTextBox("Nothing to do!");
+                m_onRunFileCallback("Nothing to do!", 0, 0);
 
                 ClearCallbacks();
 

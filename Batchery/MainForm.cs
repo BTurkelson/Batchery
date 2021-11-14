@@ -116,7 +116,7 @@ namespace Batchery
             }
             else
             {
-                stdTextBox.AppendText(text);
+                ParseForKeywordFormattingAndAppendTextTo(stdTextBox, text);
             }
         }
 
@@ -128,7 +128,93 @@ namespace Batchery
             }
             else
             {
-                errTextBox.AppendText(text);
+                ParseForKeywordFormattingAndAppendTextTo(errTextBox, text);
+            }
+        }
+
+        private void ParseForKeywordFormattingAndAppendTextTo(RichTextBox textBox, string text)
+        {
+            // Note we avoid doing this in an OnTextChanged event handler so we only have to parse
+            // the new text.
+            if (detectErrorsCheckBox.Checked == false && detectWarningsCheckBox.Checked == false)
+            {
+                textBox.AppendText(text);
+            }
+            else
+            {
+                Color currentTextColor = textBox.SelectionColor;
+                Color currentBackColor = textBox.SelectionBackColor;
+
+                SortedList<int, Tuple<int, Color, Color>> formatList = new SortedList<int, Tuple<int, Color, Color>>();
+
+                if (detectErrorsCheckBox.Checked)
+                {
+                    string[] keyWords =
+                    {
+                        "error(s)",
+                        "errors",
+                        "error",
+                    };
+
+                    Color textColor = Color.Firebrick; // Alternate choice: Color.FromArgb(0xFF, 0xC0, 0x50, 0x4D);
+                    Color backColor = currentBackColor;
+
+                    InsertFormatHelper(keyWords, textColor, backColor, text, ref formatList);
+                }
+
+                if (detectWarningsCheckBox.Checked)
+                {
+                    string[] keyWords =
+                    {
+                        "warning(s)",
+                        "warnings",
+                        "warning",
+                    };
+
+                    Color textColor = Color.FromArgb(0xFF, 0xF7, 0x96, 0x46); // Alternate choice: Color.DarkOrange;
+                    Color backColor = currentBackColor;
+
+                    InsertFormatHelper(keyWords, textColor, backColor, text, ref formatList);
+                }
+
+                int index = 0;
+                foreach(KeyValuePair<int, Tuple<int, Color, Color>> kvp in formatList)
+                {
+                    textBox.AppendText(text.Substring(index, (kvp.Key - index)));
+
+                    textBox.SelectionColor = kvp.Value.Item2;
+                    textBox.SelectionBackColor = kvp.Value.Item3;
+                    textBox.AppendText(text.Substring(kvp.Key, kvp.Value.Item1));
+                    textBox.SelectionColor = currentTextColor;
+                    textBox.SelectionBackColor = currentBackColor;
+
+                    index = kvp.Key + kvp.Value.Item1;
+                }
+                textBox.AppendText(text.Substring(index));
+            }
+        }
+
+        private void InsertFormatHelper(string[] keyWords, Color textColor, Color backColor, string text, ref SortedList<int, Tuple<int, Color, Color>> formatList)
+        {
+            foreach (string keyWord in keyWords)
+            {
+                int index = text.IndexOf(keyWord);
+                while (index >= 0)
+                {
+                    if (formatList.ContainsKey(index))
+                    {
+                        if (keyWord.Length > formatList[index].Item1)
+                        {
+                            formatList[index] = new Tuple<int, Color, Color>(keyWord.Length, textColor, backColor);
+                        }
+                    }
+                    else
+                    {
+                        formatList.Add(index, new Tuple<int, Color, Color>(keyWord.Length, textColor, backColor));
+                    }
+
+                    index = text.IndexOf(keyWord, index + keyWord.Length);
+                }
             }
         }
 
@@ -179,6 +265,9 @@ namespace Batchery
         {
             SessionSettings.Default.Height = this.Height;
             SessionSettings.Default.Width = this.Width;
+            SessionSettings.Default.DetectLinks = detectLinksCheckBox.Checked;
+            SessionSettings.Default.DetectErrors = detectErrorsCheckBox.Checked;
+            SessionSettings.Default.DetectWarnings = detectWarningsCheckBox.Checked;
             m_batchManager.SaveToSettings();
             SessionSettings.Default.Save();
         }
@@ -187,6 +276,9 @@ namespace Batchery
         {
             this.Height = SessionSettings.Default.Height;
             this.Width = SessionSettings.Default.Width;
+            detectLinksCheckBox.Checked = SessionSettings.Default.DetectLinks;
+            detectErrorsCheckBox.Checked = SessionSettings.Default.DetectErrors;
+            detectWarningsCheckBox.Checked = SessionSettings.Default.DetectWarnings;
 
             m_batchManager.LoadFromSettings();
 
@@ -342,6 +434,17 @@ namespace Batchery
 
             editButton.Enabled = validItemHighlighted;
             contextMenuStrip2.Items[8].Enabled = validItemHighlighted;
+        }
+
+        private void LinkClicked(object sender, System.Windows.Forms.LinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("explorer.exe", e.LinkText);
+        }
+
+        private void detectLinksCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            stdTextBox.DetectUrls = detectLinksCheckBox.Checked;
+            errTextBox.DetectUrls = detectLinksCheckBox.Checked;
         }
     }
 }
