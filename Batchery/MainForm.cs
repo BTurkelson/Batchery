@@ -54,8 +54,11 @@ namespace Batchery
             cancelButton.Enabled = true;
             runButton.Enabled = false;
 
-            // Disable editing of batch files during a run.
-            mainTabControl.TabPages[1].Enabled = false;
+            // Disable other tabs (aside from 0) during a run.
+            for (int i = 1; i < mainTabControl.TabCount; i++)
+            {
+                mainTabControl.TabPages[i].Enabled = false;
+            }
 
             textProgressBar.Value = 0;
             textProgressBar.ProgressColor = m_GoodColor;
@@ -96,7 +99,12 @@ namespace Batchery
                 System.Media.SystemSounds.Beep.Play();
                 cancelButton.Enabled = false;
                 runButton.Enabled = true;
-                mainTabControl.TabPages[1].Enabled = true;
+
+                // Disable other tabs (aside from 0) during a run.
+                for (int i = 1; i < mainTabControl.TabCount; i++)
+                {
+                    mainTabControl.TabPages[i].Enabled = true;
+                }
             }
         }
 
