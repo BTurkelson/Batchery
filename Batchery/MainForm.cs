@@ -293,7 +293,7 @@ namespace Batchery
         {
             // Displays a SaveFileDialog so the user can save the output
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter   = "Text files (*.txt)|*.txt";
+            saveFileDialog.Filter   = "Text (.txt)|*.txt|Rich Text (.rtf)|*.rtf";
             saveFileDialog.Title    = "Save As";
             saveFileDialog.ShowDialog();
 
@@ -306,7 +306,16 @@ namespace Batchery
 
                 using (System.IO.StreamWriter outputFile = new System.IO.StreamWriter(fs))
                 {
-                    outputFile.WriteLine(m_curVisibleTextBox.Text);
+                    switch (saveFileDialog.FilterIndex)
+                    {
+                        case 1: //Text
+                            outputFile.WriteLine(m_curVisibleTextBox.Text);
+                            break;
+
+                        case 2: //Rich Text
+                            outputFile.WriteLine(m_curVisibleTextBox.Rtf);
+                            break;
+                    }
                 }
 
                 fs.Close();
