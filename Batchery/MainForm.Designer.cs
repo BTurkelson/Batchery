@@ -75,6 +75,8 @@ namespace Batchery
             this.detectWarningsLabel = new System.Windows.Forms.Label();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.injectBatcheryOutputCheckBox = new System.Windows.Forms.CheckBox();
+            this.injectBatcheryOutputLabel = new System.Windows.Forms.Label();
             this.mainTabControl.SuspendLayout();
             this.outputTab.SuspendLayout();
             this.outputTabControl.SuspendLayout();
@@ -301,7 +303,7 @@ namespace Batchery
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(731, 33);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(728, 33);
             this.tableLayoutPanel2.TabIndex = 2;
             // 
             // addButton
@@ -311,7 +313,7 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Right)));
             this.addButton.Location = new System.Drawing.Point(3, 3);
             this.addButton.Name = "addButton";
-            this.addButton.Size = new System.Drawing.Size(237, 27);
+            this.addButton.Size = new System.Drawing.Size(236, 27);
             this.addButton.TabIndex = 0;
             this.addButton.Text = "Add";
             this.addButton.UseVisualStyleBackColor = true;
@@ -323,9 +325,9 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.removeButton.Enabled = false;
-            this.removeButton.Location = new System.Drawing.Point(246, 3);
+            this.removeButton.Location = new System.Drawing.Point(245, 3);
             this.removeButton.Name = "removeButton";
-            this.removeButton.Size = new System.Drawing.Size(237, 27);
+            this.removeButton.Size = new System.Drawing.Size(236, 27);
             this.removeButton.TabIndex = 1;
             this.removeButton.Text = "Remove";
             this.removeButton.UseVisualStyleBackColor = true;
@@ -337,9 +339,9 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.editButton.Enabled = false;
-            this.editButton.Location = new System.Drawing.Point(489, 3);
+            this.editButton.Location = new System.Drawing.Point(487, 3);
             this.editButton.Name = "editButton";
-            this.editButton.Size = new System.Drawing.Size(239, 27);
+            this.editButton.Size = new System.Drawing.Size(238, 27);
             this.editButton.TabIndex = 2;
             this.editButton.Text = "Edit in Notepad";
             this.editButton.UseVisualStyleBackColor = true;
@@ -518,9 +520,12 @@ namespace Batchery
             this.tableLayoutPanel3.Controls.Add(this.detectErrorsLabel, 1, 1);
             this.tableLayoutPanel3.Controls.Add(this.detectWarningsCheckBox, 0, 2);
             this.tableLayoutPanel3.Controls.Add(this.detectWarningsLabel, 1, 2);
+            this.tableLayoutPanel3.Controls.Add(this.injectBatcheryOutputCheckBox, 0, 3);
+            this.tableLayoutPanel3.Controls.Add(this.injectBatcheryOutputLabel, 1, 3);
             this.tableLayoutPanel3.Location = new System.Drawing.Point(19, 19);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 4;
+            this.tableLayoutPanel3.RowCount = 5;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
@@ -594,6 +599,26 @@ namespace Batchery
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // injectBatcheryOutputCheckBox
+            // 
+            this.injectBatcheryOutputCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.injectBatcheryOutputCheckBox.AutoSize = true;
+            this.injectBatcheryOutputCheckBox.Location = new System.Drawing.Point(3, 63);
+            this.injectBatcheryOutputCheckBox.Name = "injectBatcheryOutputCheckBox";
+            this.injectBatcheryOutputCheckBox.Size = new System.Drawing.Size(14, 14);
+            this.injectBatcheryOutputCheckBox.TabIndex = 6;
+            this.injectBatcheryOutputCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // injectBatcheryOutputLabel
+            // 
+            this.injectBatcheryOutputLabel.AutoSize = true;
+            this.injectBatcheryOutputLabel.Location = new System.Drawing.Point(23, 60);
+            this.injectBatcheryOutputLabel.Name = "injectBatcheryOutputLabel";
+            this.injectBatcheryOutputLabel.Size = new System.Drawing.Size(161, 15);
+            this.injectBatcheryOutputLabel.TabIndex = 7;
+            this.injectBatcheryOutputLabel.Text = "Inject Batchery Status Output";
             // 
             // MainForm
             // 
@@ -670,6 +695,8 @@ namespace Batchery
         private System.Windows.Forms.Label detectErrorsLabel;
         private System.Windows.Forms.CheckBox detectWarningsCheckBox;
         private System.Windows.Forms.Label detectWarningsLabel;
+        private System.Windows.Forms.CheckBox injectBatcheryOutputCheckBox;
+        private System.Windows.Forms.Label injectBatcheryOutputLabel;
     }
 }
 

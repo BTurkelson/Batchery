@@ -17,6 +17,7 @@ namespace Batchery
         public delegate void OnTextRecievedCallback(string text);
         private OnTextRecievedCallback m_onStdOutRecievedCallback;
         private OnTextRecievedCallback m_onStdErrRecievedCallback;
+        private OnTextRecievedCallback m_onStatusRecievedCallback;
 
         private System.Windows.Forms.CheckedListBox m_listBox;
         private bool m_suspendBatchListItemCheck = false;
@@ -32,13 +33,14 @@ namespace Batchery
             m_listBox = listBox;
         }
 
-        public void OnRun(OnEndCallback onEnd, OnRunFileCallback onRunFile, OnTextRecievedCallback stdOutCallback, OnTextRecievedCallback stdErrCallback)
+        public void OnRun(OnEndCallback onEnd, OnRunFileCallback onRunFile, OnTextRecievedCallback stdOutCallback, OnTextRecievedCallback stdErrCallback, OnTextRecievedCallback statusCallback)
         {
             m_onEndCallback = onEnd;
             m_onRunFileCallback = onRunFile;
             m_onStdOutRecievedCallback = stdOutCallback;
             m_onStdErrRecievedCallback = stdErrCallback;
-            
+            m_onStatusRecievedCallback = statusCallback;
+
             if (m_listBox.CheckedItems.Count > 0)
             {
                 m_BatchFiles.Clear();
@@ -83,13 +85,14 @@ namespace Batchery
             m_onRunFileCallback = null;
             m_onStdOutRecievedCallback = null;
             m_onStdErrRecievedCallback = null;
+            m_onStatusRecievedCallback = null;
         }
 
         private void RunNext()
         {
             string file = m_BatchFiles.Dequeue();
 
-            WriteTextBox("Starting " + file);
+            m_onStatusRecievedCallback("Starting " + file);
 
             m_BatchProcess.StartInfo.FileName = file;
             m_BatchProcess.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(file);
@@ -106,7 +109,7 @@ namespace Batchery
             }
             catch (Exception e)
             {
-                WriteTextBox("Exception Thrown: " + e.Message);
+                m_onStatusRecievedCallback("Exception Thrown: " + e.Message);
                 System.Windows.Forms.MessageBox.Show(e.Message, "Error!", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 if (m_onEndCallback != null)
                 {
@@ -126,7 +129,7 @@ namespace Batchery
             if (m_BatchProcess.HasExited)
             {
                 exitCode = m_BatchProcess.ExitCode;
-                WriteTextBox("Exited with code: " + m_BatchProcess.ExitCode);
+                m_onStatusRecievedCallback("Exited with code: " + m_BatchProcess.ExitCode);
             }
 
             bool endNow = true;
@@ -139,7 +142,7 @@ namespace Batchery
                 }
                 else
                 {
-                    WriteTextBox("Aborting due to nonzero exit code");
+                    m_onStatusRecievedCallback("Aborting due to nonzero exit code");
                 }
             }
             
@@ -153,23 +156,9 @@ namespace Batchery
 
         public void OnCancel()
         {
-            WriteTextBox("Cancelled!");
+            m_onStatusRecievedCallback("Cancelled!");
             m_BatchFiles.Clear();
             m_BatchProcess.Kill(true);
-        }
-
-        private void WriteTextBox(string toWrite)
-        {
-            string outString = Environment.NewLine;
-            // Rich Text Box doesn't like box characters; it switches them all to Segoe UI for some reason.
-            //outString += "┏━" + new string('━', toWrite.Length) + "━┓" + Environment.NewLine;
-            //outString += "┃ " + toWrite                         + " ┃" + Environment.NewLine;
-            //outString += "┗━" + new string('━', toWrite.Length) + "━┛" + Environment.NewLine;
-            outString += "==" + new string('=', toWrite.Length) + "==" + Environment.NewLine;
-            outString += "= " + toWrite                         + " =" + Environment.NewLine;            
-            outString += "==" + new string('=', toWrite.Length) + "==" + Environment.NewLine;
-            m_onStdOutRecievedCallback(outString);
-            m_onStdErrRecievedCallback(outString);
         }
 
         private void OnStdOut(object sendingProcess, System.Diagnostics.DataReceivedEventArgs outLine)

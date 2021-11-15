@@ -55,7 +55,7 @@ namespace Batchery
             textProgressBar.ProgressColor = System.Drawing.Color.LightGreen;
             textProgressBar.Invalidate();
 
-            m_batchManager.OnRun(onBatchRunEnd, onBatchRunFile, onStdOutRecieved, onStdErrRecieved);
+            m_batchManager.OnRun(onBatchRunEnd, onBatchRunFile, onStdOutRecieved, onStdErrRecieved, onStatusRecieved);
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
@@ -129,6 +129,35 @@ namespace Batchery
             else
             {
                 ParseForKeywordFormattingAndAppendTextTo(errTextBox, text);
+            }
+        }
+
+        private void onStatusRecieved(string text)
+        {
+            if (injectBatcheryOutputCheckBox.Checked)
+            {
+                string outString = Environment.NewLine;
+                // Rich Text Box doesn't like box characters; it switches them all to Segoe UI for some reason.
+                //outString += "┏━" + new string('━', toWrite.Length) + "━┓" + Environment.NewLine;
+                //outString += "┃ " + toWrite                         + " ┃" + Environment.NewLine;
+                //outString += "┗━" + new string('━', toWrite.Length) + "━┛" + Environment.NewLine;
+                outString += "==" + new string('=', text.Length) + "==" + Environment.NewLine;
+                outString += "= " + text + " =" + Environment.NewLine;
+                outString += "==" + new string('=', text.Length) + "==" + Environment.NewLine;
+                AppendStatusTextTo(stdTextBox, outString);
+                AppendStatusTextTo(errTextBox, outString);
+            }
+        }
+
+        private void AppendStatusTextTo(RichTextBox textBox, string text)
+        {
+            if (textBox.InvokeRequired)
+            {
+                textBox.Invoke(new Action<RichTextBox, string>(AppendStatusTextTo), textBox, text);
+            }
+            else
+            {
+                textBox.AppendText(text);
             }
         }
 
@@ -268,6 +297,7 @@ namespace Batchery
             SessionSettings.Default.DetectLinks = detectLinksCheckBox.Checked;
             SessionSettings.Default.DetectErrors = detectErrorsCheckBox.Checked;
             SessionSettings.Default.DetectWarnings = detectWarningsCheckBox.Checked;
+            SessionSettings.Default.InjectBatcheryOutput = injectBatcheryOutputCheckBox.Checked;
             m_batchManager.SaveToSettings();
             SessionSettings.Default.Save();
         }
@@ -279,6 +309,7 @@ namespace Batchery
             detectLinksCheckBox.Checked = SessionSettings.Default.DetectLinks;
             detectErrorsCheckBox.Checked = SessionSettings.Default.DetectErrors;
             detectWarningsCheckBox.Checked = SessionSettings.Default.DetectWarnings;
+            injectBatcheryOutputCheckBox.Checked = SessionSettings.Default.InjectBatcheryOutput;
 
             m_batchManager.LoadFromSettings();
 
