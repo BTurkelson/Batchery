@@ -18,6 +18,12 @@ namespace Batchery
 
         private System.Drawing.Text.PrivateFontCollection fonts = new System.Drawing.Text.PrivateFontCollection();
         private Font m_OutputFont;
+        private Font m_StatusFont = new Font("Bahnschrift Light", 11, FontStyle.Regular);
+
+        private Color m_GoodColor = System.Drawing.Color.LightGreen;
+        private Color m_GoodColorLight = Color.FromArgb(0xDC, 0xE8, 0xDC);
+        private Color m_BadColor = System.Drawing.Color.LightCoral;
+        private Color m_BadColorLight = Color.FromArgb(0xEA, 0xDE, 0xDE);
 
         private RichTextBox m_curVisibleTextBox;
         private BatchManager m_batchManager;
@@ -51,7 +57,11 @@ namespace Batchery
             // Disable editing of batch files during a run.
             mainTabControl.TabPages[1].Enabled = false;
 
-            m_batchManager.OnRun(onBatchRunEnd, onStdOutRecieved, onStdErrRecieved);
+            textProgressBar.Value = 0;
+            textProgressBar.ProgressColor = m_GoodColor;
+            textProgressBar.Invalidate();
+
+            m_batchManager.OnRun(onBatchRunEnd, onBatchRunFile, onStdOutRecieved, onStdErrRecieved, onStatusRecieved);
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
@@ -68,10 +78,39 @@ namespace Batchery
             }
             else
             {
+                if (exitCode == 0)
+                {
+                    textProgressBar.Value = 0;
+                    textProgressBar.ProgressColor = m_GoodColor;
+                    textProgressBar.CustomText = "";
+                    textProgressBar.Invalidate();
+                }
+                else
+                {
+                    textProgressBar.Maximum = 1;
+                    textProgressBar.Value = 1;
+                    textProgressBar.ProgressColor = m_BadColor;
+                    textProgressBar.Invalidate();
+                }
+
                 System.Media.SystemSounds.Beep.Play();
                 cancelButton.Enabled = false;
                 runButton.Enabled = true;
                 mainTabControl.TabPages[1].Enabled = true;
+            }
+        }
+
+        private void onBatchRunFile(string file, int stepIdx, int numSteps)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<string, int, int>(onBatchRunFile), file, stepIdx, numSteps);
+            }
+            else
+            {
+                textProgressBar.CustomText = "(" + stepIdx.ToString() + "/" + numSteps.ToString() + ") " + file;
+                textProgressBar.Value = stepIdx;
+                textProgressBar.Maximum = numSteps;
             }
         }
 
@@ -83,7 +122,7 @@ namespace Batchery
             }
             else
             {
-                stdTextBox.AppendText(text);
+                ParseForKeywordFormattingAndAppendTextTo(stdTextBox, text);
             }
         }
 
@@ -95,7 +134,139 @@ namespace Batchery
             }
             else
             {
-                errTextBox.AppendText(text);
+                ParseForKeywordFormattingAndAppendTextTo(errTextBox, text);
+            }
+        }
+
+        private void onStatusRecieved(string text, bool err)
+        {
+            if (injectBatcheryOutputCheckBox.Checked)
+            {
+                string outString = "Ξ " + text + " Ξ" + Environment.NewLine;
+                AppendStatusTextTo(stdTextBox, outString, err);
+                AppendStatusTextTo(errTextBox, outString, err);
+            }
+        }
+
+        private void AppendStatusTextTo(RichTextBox textBox, string text, bool err)
+        {
+            if (textBox.InvokeRequired)
+            {
+                textBox.Invoke(new Action<RichTextBox, string, bool>(AppendStatusTextTo), textBox, text, err);
+            }
+            else
+            {
+                Color currentTextColor = textBox.SelectionColor;
+                Color currentBackColor = textBox.SelectionBackColor;
+
+                //int lastNewLine = textBox.Text.LastIndexOf('\n');
+                //if (lastNewLine >= 0)
+                //{ 
+                //    string previousLine = textBox.Text.Substring(lastNewLine).Trim();
+                //    if (previousLine.Length > 0)
+                //    {
+                //        textBox.AppendText(Environment.NewLine);
+                //    }
+                //}
+                if (textBox.TextLength > 0)
+                {
+                    textBox.AppendText(Environment.NewLine);
+                }
+
+                textBox.SelectionFont = m_StatusFont;
+                textBox.SelectionBackColor = err ? m_BadColorLight : m_GoodColorLight;
+                textBox.SelectionAlignment = HorizontalAlignment.Center;
+                textBox.AppendText(text);
+                textBox.SelectionBackColor = currentBackColor;
+                textBox.SelectionFont = m_OutputFont;
+            }
+        }
+
+        private void ParseForKeywordFormattingAndAppendTextTo(RichTextBox textBox, string text)
+        {
+            textBox.SelectionAlignment = HorizontalAlignment.Left;
+
+            // Note we avoid doing this in an OnTextChanged event handler so we only have to parse
+            // the new text.
+            if (detectErrorsCheckBox.Checked == false && detectWarningsCheckBox.Checked == false)
+            {
+                textBox.AppendText(text);
+            }
+            else
+            {
+                Color currentTextColor = textBox.SelectionColor;
+                Color currentBackColor = Control.DefaultBackColor;
+
+                SortedList<int, Tuple<int, Color, Color>> formatList = new SortedList<int, Tuple<int, Color, Color>>();
+
+                if (detectErrorsCheckBox.Checked)
+                {
+                    string[] keyWords =
+                    {
+                        "error(s)",
+                        "errors",
+                        "error",
+                    };
+
+                    Color textColor = Color.Firebrick; // Alternate choice: Color.FromArgb(0xFF, 0xC0, 0x50, 0x4D);
+                    Color backColor = currentBackColor;
+
+                    InsertFormatHelper(keyWords, textColor, backColor, text, ref formatList);
+                }
+
+                if (detectWarningsCheckBox.Checked)
+                {
+                    string[] keyWords =
+                    {
+                        "warning(s)",
+                        "warnings",
+                        "warning",
+                    };
+
+                    Color textColor = Color.FromArgb(0xFF, 0xF7, 0x96, 0x46); // Alternate choice: Color.DarkOrange;
+                    Color backColor = currentBackColor;
+
+                    InsertFormatHelper(keyWords, textColor, backColor, text, ref formatList);
+                }
+
+                int index = 0;
+                foreach(KeyValuePair<int, Tuple<int, Color, Color>> kvp in formatList)
+                {
+                    textBox.AppendText(text.Substring(index, (kvp.Key - index)));
+
+                    textBox.SelectionColor = kvp.Value.Item2;
+                    textBox.SelectionBackColor = kvp.Value.Item3;
+                    textBox.AppendText(text.Substring(kvp.Key, kvp.Value.Item1));
+                    textBox.SelectionColor = currentTextColor;
+                    textBox.SelectionBackColor = currentBackColor;
+
+                    index = kvp.Key + kvp.Value.Item1;
+                }
+                textBox.AppendText(text.Substring(index));
+            }
+        }
+
+        private void InsertFormatHelper(string[] keyWords, Color textColor, Color backColor, string text, ref SortedList<int, Tuple<int, Color, Color>> formatList)
+        {
+            foreach (string keyWord in keyWords)
+            {
+                int index = text.IndexOf(keyWord, StringComparison.CurrentCultureIgnoreCase);
+                while (index >= 0)
+                {
+                    if (formatList.ContainsKey(index))
+                    {
+                        if (keyWord.Length > formatList[index].Item1)
+                        {
+                            formatList[index] = new Tuple<int, Color, Color>(keyWord.Length, textColor, backColor);
+                        }
+                    }
+                    else
+                    {
+                        formatList.Add(index, new Tuple<int, Color, Color>(keyWord.Length, textColor, backColor));
+                    }
+
+                    index = text.IndexOf(keyWord, (index + keyWord.Length), StringComparison.CurrentCultureIgnoreCase);
+                }
             }
         }
 
@@ -122,7 +293,7 @@ namespace Batchery
         {
             // Displays a SaveFileDialog so the user can save the output
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter   = "Text files (*.txt)|*.txt";
+            saveFileDialog.Filter   = "Text (.txt)|*.txt|Rich Text (.rtf)|*.rtf";
             saveFileDialog.Title    = "Save As";
             saveFileDialog.ShowDialog();
 
@@ -135,7 +306,16 @@ namespace Batchery
 
                 using (System.IO.StreamWriter outputFile = new System.IO.StreamWriter(fs))
                 {
-                    outputFile.WriteLine(m_curVisibleTextBox.Text);
+                    switch (saveFileDialog.FilterIndex)
+                    {
+                        case 1: //Text
+                            outputFile.WriteLine(m_curVisibleTextBox.Text);
+                            break;
+
+                        case 2: //Rich Text
+                            outputFile.WriteLine(m_curVisibleTextBox.Rtf);
+                            break;
+                    }
                 }
 
                 fs.Close();
@@ -146,6 +326,10 @@ namespace Batchery
         {
             SessionSettings.Default.Height = this.Height;
             SessionSettings.Default.Width = this.Width;
+            SessionSettings.Default.DetectLinks = detectLinksCheckBox.Checked;
+            SessionSettings.Default.DetectErrors = detectErrorsCheckBox.Checked;
+            SessionSettings.Default.DetectWarnings = detectWarningsCheckBox.Checked;
+            SessionSettings.Default.InjectBatcheryOutput = injectBatcheryOutputCheckBox.Checked;
             m_batchManager.SaveToSettings();
             SessionSettings.Default.Save();
         }
@@ -154,6 +338,10 @@ namespace Batchery
         {
             this.Height = SessionSettings.Default.Height;
             this.Width = SessionSettings.Default.Width;
+            detectLinksCheckBox.Checked = SessionSettings.Default.DetectLinks;
+            detectErrorsCheckBox.Checked = SessionSettings.Default.DetectErrors;
+            detectWarningsCheckBox.Checked = SessionSettings.Default.DetectWarnings;
+            injectBatcheryOutputCheckBox.Checked = SessionSettings.Default.InjectBatcheryOutput;
 
             m_batchManager.LoadFromSettings();
 
@@ -309,6 +497,17 @@ namespace Batchery
 
             editButton.Enabled = validItemHighlighted;
             contextMenuStrip2.Items[8].Enabled = validItemHighlighted;
+        }
+
+        private void LinkClicked(object sender, System.Windows.Forms.LinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("explorer.exe", e.LinkText);
+        }
+
+        private void detectLinksCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            stdTextBox.DetectUrls = detectLinksCheckBox.Checked;
+            errTextBox.DetectUrls = detectLinksCheckBox.Checked;
         }
     }
 }

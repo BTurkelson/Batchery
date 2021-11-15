@@ -68,5 +68,53 @@ namespace Batchery {
                 this["SelectedBatchIndices"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DetectLinks {
+            get {
+                return ((bool)(this["DetectLinks"]));
+            }
+            set {
+                this["DetectLinks"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DetectErrors {
+            get {
+                return ((bool)(this["DetectErrors"]));
+            }
+            set {
+                this["DetectErrors"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DetectWarnings {
+            get {
+                return ((bool)(this["DetectWarnings"]));
+            }
+            set {
+                this["DetectWarnings"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool InjectBatcheryOutput {
+            get {
+                return ((bool)(this["InjectBatcheryOutput"]));
+            }
+            set {
+                this["InjectBatcheryOutput"] = value;
+            }
+        }
     }
 }
