@@ -18,6 +18,12 @@ namespace Batchery
 
         private System.Drawing.Text.PrivateFontCollection fonts = new System.Drawing.Text.PrivateFontCollection();
         private Font m_OutputFont;
+        private Font m_StatusFont = new Font("Bahnschrift Light", 11, FontStyle.Regular);
+
+        private Color m_GoodColor = System.Drawing.Color.LightGreen;
+        private Color m_GoodColorLight = Color.FromArgb(0xDC, 0xE8, 0xDC);
+        private Color m_BadColor = System.Drawing.Color.LightCoral;
+        private Color m_BadColorLight = Color.FromArgb(0xEA, 0xDE, 0xDE);
 
         private RichTextBox m_curVisibleTextBox;
         private BatchManager m_batchManager;
@@ -52,7 +58,7 @@ namespace Batchery
             mainTabControl.TabPages[1].Enabled = false;
 
             textProgressBar.Value = 0;
-            textProgressBar.ProgressColor = System.Drawing.Color.LightGreen;
+            textProgressBar.ProgressColor = m_GoodColor;
             textProgressBar.Invalidate();
 
             m_batchManager.OnRun(onBatchRunEnd, onBatchRunFile, onStdOutRecieved, onStdErrRecieved, onStatusRecieved);
@@ -75,7 +81,7 @@ namespace Batchery
                 if (exitCode == 0)
                 {
                     textProgressBar.Value = 0;
-                    textProgressBar.ProgressColor = System.Drawing.Color.LightGreen;
+                    textProgressBar.ProgressColor = m_GoodColor;
                     textProgressBar.CustomText = "";
                     textProgressBar.Invalidate();
                 }
@@ -83,7 +89,7 @@ namespace Batchery
                 {
                     textProgressBar.Maximum = 1;
                     textProgressBar.Value = 1;
-                    textProgressBar.ProgressColor = System.Drawing.Color.LightCoral;
+                    textProgressBar.ProgressColor = m_BadColor;
                     textProgressBar.Invalidate();
                 }
 
@@ -132,37 +138,54 @@ namespace Batchery
             }
         }
 
-        private void onStatusRecieved(string text)
+        private void onStatusRecieved(string text, bool err)
         {
             if (injectBatcheryOutputCheckBox.Checked)
             {
-                string outString = Environment.NewLine;
-                // Rich Text Box doesn't like box characters; it switches them all to Segoe UI for some reason.
-                //outString += "┏━" + new string('━', toWrite.Length) + "━┓" + Environment.NewLine;
-                //outString += "┃ " + toWrite                         + " ┃" + Environment.NewLine;
-                //outString += "┗━" + new string('━', toWrite.Length) + "━┛" + Environment.NewLine;
-                outString += "==" + new string('=', text.Length) + "==" + Environment.NewLine;
-                outString += "= " + text + " =" + Environment.NewLine;
-                outString += "==" + new string('=', text.Length) + "==" + Environment.NewLine;
-                AppendStatusTextTo(stdTextBox, outString);
-                AppendStatusTextTo(errTextBox, outString);
+                string outString = "Ξ " + text + " Ξ" + Environment.NewLine;
+                AppendStatusTextTo(stdTextBox, outString, err);
+                AppendStatusTextTo(errTextBox, outString, err);
             }
         }
 
-        private void AppendStatusTextTo(RichTextBox textBox, string text)
+        private void AppendStatusTextTo(RichTextBox textBox, string text, bool err)
         {
             if (textBox.InvokeRequired)
             {
-                textBox.Invoke(new Action<RichTextBox, string>(AppendStatusTextTo), textBox, text);
+                textBox.Invoke(new Action<RichTextBox, string, bool>(AppendStatusTextTo), textBox, text, err);
             }
             else
             {
+                Color currentTextColor = textBox.SelectionColor;
+                Color currentBackColor = textBox.SelectionBackColor;
+
+                //int lastNewLine = textBox.Text.LastIndexOf('\n');
+                //if (lastNewLine >= 0)
+                //{ 
+                //    string previousLine = textBox.Text.Substring(lastNewLine).Trim();
+                //    if (previousLine.Length > 0)
+                //    {
+                //        textBox.AppendText(Environment.NewLine);
+                //    }
+                //}
+                if (textBox.TextLength > 0)
+                {
+                    textBox.AppendText(Environment.NewLine);
+                }
+
+                textBox.SelectionFont = m_StatusFont;
+                textBox.SelectionBackColor = err ? m_BadColorLight : m_GoodColorLight;
+                textBox.SelectionAlignment = HorizontalAlignment.Center;
                 textBox.AppendText(text);
+                textBox.SelectionBackColor = currentBackColor;
+                textBox.SelectionFont = m_OutputFont;
             }
         }
 
         private void ParseForKeywordFormattingAndAppendTextTo(RichTextBox textBox, string text)
         {
+            textBox.SelectionAlignment = HorizontalAlignment.Left;
+
             // Note we avoid doing this in an OnTextChanged event handler so we only have to parse
             // the new text.
             if (detectErrorsCheckBox.Checked == false && detectWarningsCheckBox.Checked == false)
@@ -172,7 +195,7 @@ namespace Batchery
             else
             {
                 Color currentTextColor = textBox.SelectionColor;
-                Color currentBackColor = textBox.SelectionBackColor;
+                Color currentBackColor = Control.DefaultBackColor;
 
                 SortedList<int, Tuple<int, Color, Color>> formatList = new SortedList<int, Tuple<int, Color, Color>>();
 
