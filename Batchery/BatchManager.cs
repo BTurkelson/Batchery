@@ -17,7 +17,9 @@ namespace Batchery
         public delegate void OnTextRecievedCallback(string text);
         private OnTextRecievedCallback m_onStdOutRecievedCallback;
         private OnTextRecievedCallback m_onStdErrRecievedCallback;
-        private OnTextRecievedCallback m_onStatusRecievedCallback;
+
+        public delegate void OnStatusRecievedCallback(string text, bool err);
+        private OnStatusRecievedCallback m_onStatusRecievedCallback;
 
         private System.Windows.Forms.CheckedListBox m_listBox;
         private bool m_suspendBatchListItemCheck = false;
@@ -33,7 +35,7 @@ namespace Batchery
             m_listBox = listBox;
         }
 
-        public void OnRun(OnEndCallback onEnd, OnRunFileCallback onRunFile, OnTextRecievedCallback stdOutCallback, OnTextRecievedCallback stdErrCallback, OnTextRecievedCallback statusCallback)
+        public void OnRun(OnEndCallback onEnd, OnRunFileCallback onRunFile, OnTextRecievedCallback stdOutCallback, OnTextRecievedCallback stdErrCallback, OnStatusRecievedCallback statusCallback)
         {
             m_onEndCallback = onEnd;
             m_onRunFileCallback = onRunFile;
@@ -92,7 +94,7 @@ namespace Batchery
         {
             string file = m_BatchFiles.Dequeue();
 
-            m_onStatusRecievedCallback("Starting " + file);
+            OnStatus("Starting " + file, false);
 
             m_BatchProcess.StartInfo.FileName = file;
             m_BatchProcess.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(file);
@@ -109,7 +111,7 @@ namespace Batchery
             }
             catch (Exception e)
             {
-                m_onStatusRecievedCallback("Exception Thrown: " + e.Message);
+                OnStatus("Exception Thrown: " + e.Message, true);
                 System.Windows.Forms.MessageBox.Show(e.Message, "Error!", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 if (m_onEndCallback != null)
                 {
@@ -129,7 +131,7 @@ namespace Batchery
             if (m_BatchProcess.HasExited)
             {
                 exitCode = m_BatchProcess.ExitCode;
-                m_onStatusRecievedCallback("Exited with code: " + m_BatchProcess.ExitCode);
+                OnStatus("Exited with code: " + m_BatchProcess.ExitCode, (exitCode != 0));
             }
 
             bool endNow = true;
@@ -142,7 +144,7 @@ namespace Batchery
                 }
                 else
                 {
-                    m_onStatusRecievedCallback("Aborting due to nonzero exit code");
+                    OnStatus("Aborting due to nonzero exit code", true);
                 }
             }
             
@@ -156,7 +158,7 @@ namespace Batchery
 
         public void OnCancel()
         {
-            m_onStatusRecievedCallback("Cancelled!");
+            OnStatus("Cancelled!", true);
             m_BatchFiles.Clear();
             m_BatchProcess.Kill(true);
         }
@@ -176,6 +178,14 @@ namespace Batchery
             if (!String.IsNullOrEmpty(outLine.Data))
             {
                 m_onStdErrRecievedCallback(Environment.NewLine + outLine.Data.ToString());
+            }
+        }
+
+        private void OnStatus(string text, bool err = false)
+        {
+            if (m_onStatusRecievedCallback != null)
+            {
+                m_onStatusRecievedCallback(text, err);
             }
         }
 
