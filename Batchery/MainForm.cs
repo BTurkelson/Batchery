@@ -198,7 +198,7 @@ namespace Batchery
         {
             foreach (string keyWord in keyWords)
             {
-                int index = text.IndexOf(keyWord);
+                int index = text.IndexOf(keyWord, StringComparison.CurrentCultureIgnoreCase);
                 while (index >= 0)
                 {
                     if (formatList.ContainsKey(index))
@@ -213,7 +213,7 @@ namespace Batchery
                         formatList.Add(index, new Tuple<int, Color, Color>(keyWord.Length, textColor, backColor));
                     }
 
-                    index = text.IndexOf(keyWord, index + keyWord.Length);
+                    index = text.IndexOf(keyWord, (index + keyWord.Length), StringComparison.CurrentCultureIgnoreCase);
                 }
             }
         }
