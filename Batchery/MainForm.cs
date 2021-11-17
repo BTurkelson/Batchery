@@ -62,6 +62,8 @@ namespace Batchery
                 if (mainTabControl.SelectedIndex == (int)MainTabControlIndices.Output)
                 {
                     OpenFindPanel(sender, e);
+                    e.Handled = true;
+                    e.SuppressKeyPress = true;
                 }
             }
             else if ((e.KeyCode == Keys.Enter) && (findTextBox.Focused))
@@ -69,6 +71,8 @@ namespace Batchery
                 if (findNextButton.Enabled)
                 {
                     findNextButton_Click(sender, e);
+                    e.Handled = true;
+                    e.SuppressKeyPress = true;
                 }
             }
             else if ((e.KeyCode == Keys.F3) && (findPanel.Visible))
@@ -78,6 +82,8 @@ namespace Batchery
                     if (findPrevButton.Enabled)
                     {
                         findPrevButton_Click(sender, e);
+                        e.Handled = true;
+                        e.SuppressKeyPress = true;
                     }
                 }
                 else
@@ -85,8 +91,16 @@ namespace Batchery
                     if (findNextButton.Enabled)
                     {
                         findNextButton_Click(sender, e);
+                        e.Handled = true;
+                        e.SuppressKeyPress = true;
                     }
                 }
+            }
+            else if ((e.KeyCode == Keys.Escape) && (findPanel.Visible))
+            {
+                CloseFindPanel(sender, e);
+                e.Handled = true;
+                e.SuppressKeyPress = true;
             }
         }
 
