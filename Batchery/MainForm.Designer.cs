@@ -33,6 +33,11 @@ namespace Batchery
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.mainTabControl = new System.Windows.Forms.TabControl();
             this.outputTab = new System.Windows.Forms.TabPage();
+            this.findPanel = new System.Windows.Forms.Panel();
+            this.findCloseButton = new System.Windows.Forms.Button();
+            this.findNextButton = new System.Windows.Forms.Button();
+            this.findPrevButton = new System.Windows.Forms.Button();
+            this.findTextBox = new System.Windows.Forms.TextBox();
             this.textProgressBar = new ProgressBarSample.TextProgressBar();
             this.cancelButton = new System.Windows.Forms.Button();
             this.outputTabControl = new System.Windows.Forms.TabControl();
@@ -73,12 +78,14 @@ namespace Batchery
             this.detectErrorsLabel = new System.Windows.Forms.Label();
             this.detectWarningsCheckBox = new System.Windows.Forms.CheckBox();
             this.detectWarningsLabel = new System.Windows.Forms.Label();
-            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.injectBatcheryOutputCheckBox = new System.Windows.Forms.CheckBox();
             this.injectBatcheryOutputLabel = new System.Windows.Forms.Label();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.findTimer = new System.Windows.Forms.Timer(this.components);
             this.mainTabControl.SuspendLayout();
             this.outputTab.SuspendLayout();
+            this.findPanel.SuspendLayout();
             this.outputTabControl.SuspendLayout();
             this.stdOutTab.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
@@ -106,11 +113,13 @@ namespace Batchery
             this.mainTabControl.Size = new System.Drawing.Size(776, 426);
             this.mainTabControl.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
             this.mainTabControl.TabIndex = 0;
+            this.mainTabControl.SelectedIndexChanged += new System.EventHandler(this.OnMainTabChanged);
             // 
             // outputTab
             // 
             this.outputTab.BackColor = System.Drawing.Color.WhiteSmoke;
             this.outputTab.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.outputTab.Controls.Add(this.findPanel);
             this.outputTab.Controls.Add(this.textProgressBar);
             this.outputTab.Controls.Add(this.cancelButton);
             this.outputTab.Controls.Add(this.outputTabControl);
@@ -121,6 +130,81 @@ namespace Batchery
             this.outputTab.Size = new System.Drawing.Size(768, 398);
             this.outputTab.TabIndex = 0;
             this.outputTab.Text = "Output";
+            // 
+            // findPanel
+            // 
+            this.findPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.findPanel.BackColor = System.Drawing.Color.White;
+            this.findPanel.Controls.Add(this.findCloseButton);
+            this.findPanel.Controls.Add(this.findNextButton);
+            this.findPanel.Controls.Add(this.findPrevButton);
+            this.findPanel.Controls.Add(this.findTextBox);
+            this.findPanel.Location = new System.Drawing.Point(109, 361);
+            this.findPanel.Name = "findPanel";
+            this.findPanel.Size = new System.Drawing.Size(646, 27);
+            this.findPanel.TabIndex = 5;
+            this.findPanel.Visible = false;
+            // 
+            // findCloseButton
+            // 
+            this.findCloseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.findCloseButton.BackColor = System.Drawing.Color.Transparent;
+            this.findCloseButton.FlatAppearance.BorderSize = 0;
+            this.findCloseButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.findCloseButton.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.findCloseButton.Location = new System.Drawing.Point(619, 2);
+            this.findCloseButton.Name = "findCloseButton";
+            this.findCloseButton.Size = new System.Drawing.Size(23, 23);
+            this.findCloseButton.TabIndex = 3;
+            this.findCloseButton.Text = "🗙";
+            this.findCloseButton.UseVisualStyleBackColor = false;
+            this.findCloseButton.Click += new System.EventHandler(this.CloseFindPanel);
+            // 
+            // findNextButton
+            // 
+            this.findNextButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.findNextButton.BackColor = System.Drawing.Color.Transparent;
+            this.findNextButton.Enabled = false;
+            this.findNextButton.FlatAppearance.BorderSize = 0;
+            this.findNextButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.findNextButton.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.findNextButton.Location = new System.Drawing.Point(590, 2);
+            this.findNextButton.Name = "findNextButton";
+            this.findNextButton.Size = new System.Drawing.Size(23, 23);
+            this.findNextButton.TabIndex = 2;
+            this.findNextButton.Text = "▼";
+            this.findNextButton.UseVisualStyleBackColor = false;
+            this.findNextButton.Click += new System.EventHandler(this.findNextButton_Click);
+            // 
+            // findPrevButton
+            // 
+            this.findPrevButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.findPrevButton.BackColor = System.Drawing.Color.Transparent;
+            this.findPrevButton.Enabled = false;
+            this.findPrevButton.FlatAppearance.BorderSize = 0;
+            this.findPrevButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.findPrevButton.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.findPrevButton.Location = new System.Drawing.Point(561, 2);
+            this.findPrevButton.Name = "findPrevButton";
+            this.findPrevButton.Size = new System.Drawing.Size(23, 23);
+            this.findPrevButton.TabIndex = 1;
+            this.findPrevButton.Text = "▲";
+            this.findPrevButton.UseVisualStyleBackColor = false;
+            this.findPrevButton.Click += new System.EventHandler(this.findPrevButton_Click);
+            // 
+            // findTextBox
+            // 
+            this.findTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.findTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.findTextBox.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.findTextBox.Location = new System.Drawing.Point(4, 4);
+            this.findTextBox.Name = "findTextBox";
+            this.findTextBox.PlaceholderText = "Find...";
+            this.findTextBox.Size = new System.Drawing.Size(551, 18);
+            this.findTextBox.TabIndex = 0;
+            this.findTextBox.TextChanged += new System.EventHandler(this.OnFindTextChanged);
             // 
             // textProgressBar
             // 
@@ -263,6 +347,7 @@ namespace Batchery
             // 
             this.runButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.runButton.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.runButton.Location = new System.Drawing.Point(6, 6);
             this.runButton.Name = "runButton";
             this.runButton.Size = new System.Drawing.Size(678, 46);
@@ -303,7 +388,7 @@ namespace Batchery
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(728, 33);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(602, 33);
             this.tableLayoutPanel2.TabIndex = 2;
             // 
             // addButton
@@ -313,7 +398,7 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Right)));
             this.addButton.Location = new System.Drawing.Point(3, 3);
             this.addButton.Name = "addButton";
-            this.addButton.Size = new System.Drawing.Size(236, 27);
+            this.addButton.Size = new System.Drawing.Size(194, 27);
             this.addButton.TabIndex = 0;
             this.addButton.Text = "Add";
             this.addButton.UseVisualStyleBackColor = true;
@@ -325,9 +410,9 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.removeButton.Enabled = false;
-            this.removeButton.Location = new System.Drawing.Point(245, 3);
+            this.removeButton.Location = new System.Drawing.Point(203, 3);
             this.removeButton.Name = "removeButton";
-            this.removeButton.Size = new System.Drawing.Size(236, 27);
+            this.removeButton.Size = new System.Drawing.Size(194, 27);
             this.removeButton.TabIndex = 1;
             this.removeButton.Text = "Remove";
             this.removeButton.UseVisualStyleBackColor = true;
@@ -339,9 +424,9 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.editButton.Enabled = false;
-            this.editButton.Location = new System.Drawing.Point(487, 3);
+            this.editButton.Location = new System.Drawing.Point(403, 3);
             this.editButton.Name = "editButton";
-            this.editButton.Size = new System.Drawing.Size(238, 27);
+            this.editButton.Size = new System.Drawing.Size(196, 27);
             this.editButton.TabIndex = 2;
             this.editButton.Text = "Edit in Notepad";
             this.editButton.UseVisualStyleBackColor = true;
@@ -596,10 +681,6 @@ namespace Batchery
             this.detectWarningsLabel.TabIndex = 5;
             this.detectWarningsLabel.Text = "Highlight Warning(s)";
             // 
-            // openFileDialog1
-            // 
-            this.openFileDialog1.FileName = "openFileDialog1";
-            // 
             // injectBatcheryOutputCheckBox
             // 
             this.injectBatcheryOutputCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -620,6 +701,15 @@ namespace Batchery
             this.injectBatcheryOutputLabel.TabIndex = 7;
             this.injectBatcheryOutputLabel.Text = "Inject Batchery Status Output";
             // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // findTimer
+            // 
+            this.findTimer.Interval = 100;
+            this.findTimer.Tick += new System.EventHandler(this.OnFindTimerTick);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -627,12 +717,16 @@ namespace Batchery
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.mainTabControl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.Name = "MainForm";
             this.Text = "Batchery";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
             this.mainTabControl.ResumeLayout(false);
             this.outputTab.ResumeLayout(false);
+            this.findPanel.ResumeLayout(false);
+            this.findPanel.PerformLayout();
             this.outputTabControl.ResumeLayout(false);
             this.stdOutTab.ResumeLayout(false);
             this.contextMenuStrip1.ResumeLayout(false);
@@ -697,6 +791,14 @@ namespace Batchery
         private System.Windows.Forms.Label detectWarningsLabel;
         private System.Windows.Forms.CheckBox injectBatcheryOutputCheckBox;
         private System.Windows.Forms.Label injectBatcheryOutputLabel;
+        private System.Windows.Forms.Panel findPanel;
+        private System.Windows.Forms.TextBox findTextBox;
+        private System.Windows.Forms.Button findPrevButton;
+        private System.Windows.Forms.Button findCloseButton;
+        private System.Windows.Forms.Button findNextButton;
+        private System.Windows.Forms.ToolStripMenuItem findToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.Timer findTimer;
     }
 }
 
