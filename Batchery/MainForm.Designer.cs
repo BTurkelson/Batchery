@@ -38,6 +38,7 @@ namespace Batchery
             this.findNextButton = new System.Windows.Forms.Button();
             this.findPrevButton = new System.Windows.Forms.Button();
             this.findTextBox = new System.Windows.Forms.TextBox();
+            this.findCountLabel = new System.Windows.Forms.Label();
             this.textProgressBar = new ProgressBarSample.TextProgressBar();
             this.cancelButton = new System.Windows.Forms.Button();
             this.outputTabControl = new System.Windows.Forms.TabControl();
@@ -80,6 +81,8 @@ namespace Batchery
             this.detectErrorsLabel = new System.Windows.Forms.Label();
             this.detectWarningsCheckBox = new System.Windows.Forms.CheckBox();
             this.detectWarningsLabel = new System.Windows.Forms.Label();
+            this.detectFindResultsCheckBox = new System.Windows.Forms.CheckBox();
+            this.detectFindResultsLabel = new System.Windows.Forms.Label();
             this.injectBatcheryOutputCheckBox = new System.Windows.Forms.CheckBox();
             this.injectBatcheryOutputLabel = new System.Windows.Forms.Label();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
@@ -142,6 +145,7 @@ namespace Batchery
             this.findPanel.Controls.Add(this.findNextButton);
             this.findPanel.Controls.Add(this.findPrevButton);
             this.findPanel.Controls.Add(this.findTextBox);
+            this.findPanel.Controls.Add(this.findCountLabel);
             this.findPanel.Location = new System.Drawing.Point(109, 361);
             this.findPanel.Name = "findPanel";
             this.findPanel.Size = new System.Drawing.Size(646, 27);
@@ -204,9 +208,23 @@ namespace Batchery
             this.findTextBox.Location = new System.Drawing.Point(4, 4);
             this.findTextBox.Name = "findTextBox";
             this.findTextBox.PlaceholderText = "Find...";
-            this.findTextBox.Size = new System.Drawing.Size(551, 18);
+            this.findTextBox.Size = new System.Drawing.Size(493, 18);
             this.findTextBox.TabIndex = 0;
             this.findTextBox.TextChanged += new System.EventHandler(this.OnFindTextChanged);
+            // 
+            // findCountLabel
+            // 
+            this.findCountLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.findCountLabel.AutoSize = true;
+            this.findCountLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.findCountLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.findCountLabel.Location = new System.Drawing.Point(503, 5);
+            this.findCountLabel.MinimumSize = new System.Drawing.Size(55, 0);
+            this.findCountLabel.Name = "findCountLabel";
+            this.findCountLabel.Size = new System.Drawing.Size(55, 17);
+            this.findCountLabel.TabIndex = 4;
+            this.findCountLabel.Text = "999/999";
+            this.findCountLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // textProgressBar
             // 
@@ -289,7 +307,7 @@ namespace Batchery
             this.toolStripSeparator4,
             this.saveAsToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(150, 76);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(150, 104);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuStrip1_Opening);
             // 
             // copyToolStripMenuItem
@@ -404,7 +422,7 @@ namespace Batchery
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(602, 33);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(587, 33);
             this.tableLayoutPanel2.TabIndex = 2;
             // 
             // addButton
@@ -414,7 +432,7 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Right)));
             this.addButton.Location = new System.Drawing.Point(3, 3);
             this.addButton.Name = "addButton";
-            this.addButton.Size = new System.Drawing.Size(194, 27);
+            this.addButton.Size = new System.Drawing.Size(189, 27);
             this.addButton.TabIndex = 0;
             this.addButton.Text = "Add";
             this.addButton.UseVisualStyleBackColor = true;
@@ -426,9 +444,9 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.removeButton.Enabled = false;
-            this.removeButton.Location = new System.Drawing.Point(203, 3);
+            this.removeButton.Location = new System.Drawing.Point(198, 3);
             this.removeButton.Name = "removeButton";
-            this.removeButton.Size = new System.Drawing.Size(194, 27);
+            this.removeButton.Size = new System.Drawing.Size(189, 27);
             this.removeButton.TabIndex = 1;
             this.removeButton.Text = "Remove";
             this.removeButton.UseVisualStyleBackColor = true;
@@ -440,9 +458,9 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.editButton.Enabled = false;
-            this.editButton.Location = new System.Drawing.Point(403, 3);
+            this.editButton.Location = new System.Drawing.Point(393, 3);
             this.editButton.Name = "editButton";
-            this.editButton.Size = new System.Drawing.Size(196, 27);
+            this.editButton.Size = new System.Drawing.Size(191, 27);
             this.editButton.TabIndex = 2;
             this.editButton.Text = "Edit in Notepad";
             this.editButton.UseVisualStyleBackColor = true;
@@ -621,11 +639,14 @@ namespace Batchery
             this.tableLayoutPanel3.Controls.Add(this.detectErrorsLabel, 1, 1);
             this.tableLayoutPanel3.Controls.Add(this.detectWarningsCheckBox, 0, 2);
             this.tableLayoutPanel3.Controls.Add(this.detectWarningsLabel, 1, 2);
-            this.tableLayoutPanel3.Controls.Add(this.injectBatcheryOutputCheckBox, 0, 3);
-            this.tableLayoutPanel3.Controls.Add(this.injectBatcheryOutputLabel, 1, 3);
+            this.tableLayoutPanel3.Controls.Add(this.detectFindResultsCheckBox, 0, 3);
+            this.tableLayoutPanel3.Controls.Add(this.detectFindResultsLabel, 1, 3);
+            this.tableLayoutPanel3.Controls.Add(this.injectBatcheryOutputCheckBox, 0, 4);
+            this.tableLayoutPanel3.Controls.Add(this.injectBatcheryOutputLabel, 1, 4);
             this.tableLayoutPanel3.Location = new System.Drawing.Point(19, 19);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 5;
+            this.tableLayoutPanel3.RowCount = 6;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
@@ -697,24 +718,44 @@ namespace Batchery
             this.detectWarningsLabel.TabIndex = 5;
             this.detectWarningsLabel.Text = "Highlight Warning(s)";
             // 
+            // detectFindResultsCheckBox
+            // 
+            this.detectFindResultsCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.detectFindResultsCheckBox.AutoSize = true;
+            this.detectFindResultsCheckBox.Location = new System.Drawing.Point(3, 63);
+            this.detectFindResultsCheckBox.Name = "detectFindResultsCheckBox";
+            this.detectFindResultsCheckBox.Size = new System.Drawing.Size(14, 14);
+            this.detectFindResultsCheckBox.TabIndex = 6;
+            this.detectFindResultsCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // detectFindResultsLabel
+            // 
+            this.detectFindResultsLabel.AutoSize = true;
+            this.detectFindResultsLabel.Location = new System.Drawing.Point(23, 60);
+            this.detectFindResultsLabel.Name = "detectFindResultsLabel";
+            this.detectFindResultsLabel.Size = new System.Drawing.Size(140, 15);
+            this.detectFindResultsLabel.TabIndex = 7;
+            this.detectFindResultsLabel.Text = "Highlight All Find Results";
+            // 
             // injectBatcheryOutputCheckBox
             // 
             this.injectBatcheryOutputCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.injectBatcheryOutputCheckBox.AutoSize = true;
-            this.injectBatcheryOutputCheckBox.Location = new System.Drawing.Point(3, 63);
+            this.injectBatcheryOutputCheckBox.Location = new System.Drawing.Point(3, 83);
             this.injectBatcheryOutputCheckBox.Name = "injectBatcheryOutputCheckBox";
             this.injectBatcheryOutputCheckBox.Size = new System.Drawing.Size(14, 14);
-            this.injectBatcheryOutputCheckBox.TabIndex = 6;
+            this.injectBatcheryOutputCheckBox.TabIndex = 8;
             this.injectBatcheryOutputCheckBox.UseVisualStyleBackColor = true;
             // 
             // injectBatcheryOutputLabel
             // 
             this.injectBatcheryOutputLabel.AutoSize = true;
-            this.injectBatcheryOutputLabel.Location = new System.Drawing.Point(23, 60);
+            this.injectBatcheryOutputLabel.Location = new System.Drawing.Point(23, 80);
             this.injectBatcheryOutputLabel.Name = "injectBatcheryOutputLabel";
             this.injectBatcheryOutputLabel.Size = new System.Drawing.Size(161, 15);
-            this.injectBatcheryOutputLabel.TabIndex = 7;
+            this.injectBatcheryOutputLabel.TabIndex = 9;
             this.injectBatcheryOutputLabel.Text = "Inject Batchery Status Output";
             // 
             // openFileDialog1
@@ -723,7 +764,7 @@ namespace Batchery
             // 
             // findTimer
             // 
-            this.findTimer.Interval = 100;
+            this.findTimer.Interval = 250;
             this.findTimer.Tick += new System.EventHandler(this.OnFindTimerTick);
             // 
             // MainForm
@@ -805,8 +846,8 @@ namespace Batchery
         private System.Windows.Forms.Label detectErrorsLabel;
         private System.Windows.Forms.CheckBox detectWarningsCheckBox;
         private System.Windows.Forms.Label detectWarningsLabel;
-        private System.Windows.Forms.CheckBox injectBatcheryOutputCheckBox;
-        private System.Windows.Forms.Label injectBatcheryOutputLabel;
+        private System.Windows.Forms.CheckBox detectFindResultsCheckBox;
+        private System.Windows.Forms.Label detectFindResultsLabel;
         private System.Windows.Forms.Panel findPanel;
         private System.Windows.Forms.TextBox findTextBox;
         private System.Windows.Forms.Button findPrevButton;
@@ -815,6 +856,9 @@ namespace Batchery
         private System.Windows.Forms.ToolStripMenuItem findToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.Timer findTimer;
+        private System.Windows.Forms.CheckBox injectBatcheryOutputCheckBox;
+        private System.Windows.Forms.Label injectBatcheryOutputLabel;
+        private System.Windows.Forms.Label findCountLabel;
     }
 }
 
