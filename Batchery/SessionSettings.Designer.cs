@@ -116,5 +116,17 @@ namespace Batchery {
                 this["InjectBatcheryOutput"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DetectFindResults {
+            get {
+                return ((bool)(this["DetectFindResults"]));
+            }
+            set {
+                this["DetectFindResults"] = value;
+            }
+        }
     }
 }

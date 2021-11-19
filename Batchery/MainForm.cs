@@ -26,8 +26,20 @@ namespace Batchery
         private Color m_BadColorLight = Color.FromArgb(0xEA, 0xDE, 0xDE);
 
         private RichTextBox m_curVisibleTextBox;
+
+        private string m_PreFindCurVisibleTextRtf;
+
         private BatchManager m_batchManager;
 
+        private int m_TotalFinds = 0;
+        private int m_CurrentFind = 0;
+
+        enum MainTabControlIndices : int
+        {
+            Output = 0,
+            BatchFiles,
+            Settings,
+        }
 
         public MainForm()
         {
@@ -46,16 +58,79 @@ namespace Batchery
             m_batchManager = new BatchManager(batchCheckedListBox);
         }
 
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if ((e.Control) && (e.KeyCode == Keys.F) && (findPanel.Visible == false))
+            {
+                if (mainTabControl.SelectedIndex == (int)MainTabControlIndices.Output)
+                {
+                    OpenFindPanel(sender, e);
+                    e.Handled = true;
+                    e.SuppressKeyPress = true;
+                }
+            }
+            else if ((e.KeyCode == Keys.Enter) && (findTextBox.Focused))
+            {
+                if (findNextButton.Enabled)
+                {
+                    findNextButton_Click(sender, e);
+                    e.Handled = true;
+                    e.SuppressKeyPress = true;
+                }
+            }
+            else if ((e.KeyCode == Keys.F3) && (findPanel.Visible))
+            {
+                if (e.Shift)
+                {
+                    if (findPrevButton.Enabled)
+                    {
+                        findPrevButton_Click(sender, e);
+                        e.Handled = true;
+                        e.SuppressKeyPress = true;
+                    }
+                }
+                else
+                {
+                    if (findNextButton.Enabled)
+                    {
+                        findNextButton_Click(sender, e);
+                        e.Handled = true;
+                        e.SuppressKeyPress = true;
+                    }
+                }
+            }
+            else if ((e.KeyCode == Keys.Escape) && (findPanel.Visible))
+            {
+                CloseFindPanel(sender, e);
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+        }
+
         private void runButton_Click(object sender, EventArgs e)
         {
+            m_PreFindCurVisibleTextRtf = "";
+            CloseFindPanel(sender, e);
+
+            stdTextBox.DeselectAll();
+            errTextBox.DeselectAll();
+
+            stdTextBox.SelectionStart = 0;
+            errTextBox.SelectionStart = 0;
+
             stdTextBox.Clear();
             errTextBox.Clear();
 
             cancelButton.Enabled = true;
             runButton.Enabled = false;
 
-            // Disable editing of batch files during a run.
-            mainTabControl.TabPages[1].Enabled = false;
+            contextMenuStrip1.Enabled = false;
+
+            // Disable other tabs (aside from 0) during a run.
+            for (int i = 1; i < mainTabControl.TabCount; i++)
+            {
+                mainTabControl.TabPages[i].Enabled = false;
+            }
 
             textProgressBar.Value = 0;
             textProgressBar.ProgressColor = m_GoodColor;
@@ -96,7 +171,17 @@ namespace Batchery
                 System.Media.SystemSounds.Beep.Play();
                 cancelButton.Enabled = false;
                 runButton.Enabled = true;
-                mainTabControl.TabPages[1].Enabled = true;
+
+                contextMenuStrip1.Enabled = true;
+
+                stdTextBox.SelectionStart = 0;
+                errTextBox.SelectionStart = 0;
+
+                // Enable other tabs after a run.
+                for (int i = 1; i < mainTabControl.TabCount; i++)
+                {
+                    mainTabControl.TabPages[i].Enabled = true;
+                }
             }
         }
 
@@ -230,7 +315,10 @@ namespace Batchery
                 }
 
                 int index = 0;
-                foreach(KeyValuePair<int, Tuple<int, Color, Color>> kvp in formatList)
+
+                Win32Utils.SuspendDrawing(textBox);
+
+                foreach (KeyValuePair<int, Tuple<int, Color, Color>> kvp in formatList)
                 {
                     textBox.AppendText(text.Substring(index, (kvp.Key - index)));
 
@@ -243,6 +331,8 @@ namespace Batchery
                     index = kvp.Key + kvp.Value.Item1;
                 }
                 textBox.AppendText(text.Substring(index));
+
+                Win32Utils.ResumeDrawing(textBox);
             }
         }
 
@@ -293,8 +383,8 @@ namespace Batchery
         {
             // Displays a SaveFileDialog so the user can save the output
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter   = "Text (.txt)|*.txt|Rich Text (.rtf)|*.rtf";
-            saveFileDialog.Title    = "Save As";
+            saveFileDialog.Filter = "Text (.txt)|*.txt|Rich Text (.rtf)|*.rtf";
+            saveFileDialog.Title = "Save As";
             saveFileDialog.ShowDialog();
 
             // If the file name is not an empty string open it for saving.
@@ -329,6 +419,7 @@ namespace Batchery
             SessionSettings.Default.DetectLinks = detectLinksCheckBox.Checked;
             SessionSettings.Default.DetectErrors = detectErrorsCheckBox.Checked;
             SessionSettings.Default.DetectWarnings = detectWarningsCheckBox.Checked;
+            SessionSettings.Default.DetectFindResults = detectFindResultsCheckBox.Checked;
             SessionSettings.Default.InjectBatcheryOutput = injectBatcheryOutputCheckBox.Checked;
             m_batchManager.SaveToSettings();
             SessionSettings.Default.Save();
@@ -341,7 +432,10 @@ namespace Batchery
             detectLinksCheckBox.Checked = SessionSettings.Default.DetectLinks;
             detectErrorsCheckBox.Checked = SessionSettings.Default.DetectErrors;
             detectWarningsCheckBox.Checked = SessionSettings.Default.DetectWarnings;
+            detectFindResultsCheckBox.Checked = SessionSettings.Default.DetectFindResults;
             injectBatcheryOutputCheckBox.Checked = SessionSettings.Default.InjectBatcheryOutput;
+
+            UpdateFindCountDisplay();
 
             m_batchManager.LoadFromSettings();
 
@@ -363,6 +457,8 @@ namespace Batchery
 
         private void OutputControl1_Selected(Object sender, TabControlEventArgs e)
         {
+            CloseFindPanel(sender, e);
+
             if (e.TabPageIndex == 0)
             {
                 m_curVisibleTextBox = stdTextBox;
@@ -484,14 +580,14 @@ namespace Batchery
             //Actions
             bool validItemHighlighted = ((batchCheckedListBox.Items.Count > 0) && (batchCheckedListBox.SelectedItem != null));
 
-            removeButton.Enabled                = validItemHighlighted;
-            contextMenuStrip2.Items[4].Enabled  = validItemHighlighted;
+            removeButton.Enabled = validItemHighlighted;
+            contextMenuStrip2.Items[4].Enabled = validItemHighlighted;
 
-            upButton.Enabled                    = validItemHighlighted && (batchCheckedListBox.SelectedIndex != 0);
-            contextMenuStrip2.Items[5].Enabled  = validItemHighlighted && (batchCheckedListBox.SelectedIndex != 0);
+            upButton.Enabled = validItemHighlighted && (batchCheckedListBox.SelectedIndex != 0);
+            contextMenuStrip2.Items[5].Enabled = validItemHighlighted && (batchCheckedListBox.SelectedIndex != 0);
 
-            downButton.Enabled                  = validItemHighlighted && (batchCheckedListBox.SelectedIndex != (batchCheckedListBox.Items.Count - 1));
-            contextMenuStrip2.Items[6].Enabled  = validItemHighlighted && (batchCheckedListBox.SelectedIndex != (batchCheckedListBox.Items.Count - 1));
+            downButton.Enabled = validItemHighlighted && (batchCheckedListBox.SelectedIndex != (batchCheckedListBox.Items.Count - 1));
+            contextMenuStrip2.Items[6].Enabled = validItemHighlighted && (batchCheckedListBox.SelectedIndex != (batchCheckedListBox.Items.Count - 1));
 
             // Item 7 is a separator
 
@@ -508,6 +604,193 @@ namespace Batchery
         {
             stdTextBox.DetectUrls = detectLinksCheckBox.Checked;
             errTextBox.DetectUrls = detectLinksCheckBox.Checked;
+        }
+
+        private void OnMainTabChanged(object sender, EventArgs e)
+        {
+            CloseFindPanel(sender, e);
+        }
+
+        private void OpenFindPanel(object sender, EventArgs e)
+        {
+            if ((findPanel.Visible == false) && (runButton.Enabled == true))
+            {
+                m_PreFindCurVisibleTextRtf = m_curVisibleTextBox.Rtf;
+                
+                findTextBox.Clear();
+                findPanel.Enabled = true;
+                findPanel.Visible = true;
+            }
+            findTextBox.Focus();
+        }
+
+        private void CloseFindPanel(object sender, EventArgs e)
+        {
+            if (findPanel.Visible == true)
+            {
+                findPanel.Enabled = false;
+                findPanel.Visible = false;
+                findTextBox.Clear();
+
+                m_TotalFinds = 0;
+                m_CurrentFind = 0;
+
+                UpdateFindCountDisplay();
+
+                m_PreFindCurVisibleTextRtf = "";
+            }
+        }
+
+        private void OnFindTextChanged(object sender, EventArgs e)
+        {
+            findTimer.Stop();
+
+            findNextButton.Enabled = false;
+            findPrevButton.Enabled = false;
+
+            if ((findTextBox.TextLength == 0) || (m_curVisibleTextBox.Text.IndexOf(findTextBox.Text, StringComparison.CurrentCultureIgnoreCase) == -1))
+            {
+                m_TotalFinds = 0;
+                m_CurrentFind = 0;
+
+                if (detectFindResultsCheckBox.Checked)
+                {
+                    Win32Utils.SuspendDrawing(m_curVisibleTextBox);
+
+                    int selectionStart = m_curVisibleTextBox.SelectionStart;
+                    m_curVisibleTextBox.Rtf = m_PreFindCurVisibleTextRtf;
+                    m_curVisibleTextBox.SelectionStart = selectionStart;
+                    m_curVisibleTextBox.ScrollToCaret();
+
+                    Win32Utils.ResumeDrawing(m_curVisibleTextBox);
+                }
+                else
+                {
+                    m_curVisibleTextBox.DeselectAll();
+                }
+
+                UpdateFindCountDisplay();
+            }
+            else
+            {
+                findTimer.Start();
+            }
+        }
+
+        private void OnFindTimerTick(object sender, EventArgs e)
+        {
+            findTimer.Stop();
+
+            int selectionStart = m_curVisibleTextBox.SelectionStart;
+
+            m_TotalFinds = 0;
+            m_CurrentFind = 0;
+
+            Win32Utils.SuspendDrawing(m_curVisibleTextBox);
+
+            if (detectFindResultsCheckBox.Checked)
+            {
+                // Undo current find formatting.
+                m_curVisibleTextBox.Rtf = m_PreFindCurVisibleTextRtf;
+            }
+
+            int index = m_curVisibleTextBox.Find(findTextBox.Text, RichTextBoxFinds.None);
+            while (index >= 0)
+            {
+                if (index < selectionStart)
+                {
+                    m_CurrentFind++;
+                }
+                m_TotalFinds++;
+
+                if (detectFindResultsCheckBox.Checked)
+                {
+                    m_curVisibleTextBox.SelectionBackColor = Color.Gold;
+                }
+
+                int next = m_curVisibleTextBox.Find(findTextBox.Text, (index + findTextBox.TextLength), RichTextBoxFinds.None);
+                if (next == index)
+                {
+                    // There appears to be undocumented behavior of Find() where the search string exactly matches the end of the text.
+                    // Passing in a start length of just past the end you would expect a return of -1, however it returns the last
+                    // found index instead.  For example, "Hello".Find("o", 5) returns 4 for some reason.
+                    break;
+                }
+                else
+                {
+                    index = next;
+                }
+            }
+
+            // Scroll to the first found instance.
+            int nextFound = m_curVisibleTextBox.Find(findTextBox.Text, selectionStart, RichTextBoxFinds.None);
+            if (nextFound < 0)
+            {
+                // Wrap
+                nextFound = m_curVisibleTextBox.Find(findTextBox.Text, RichTextBoxFinds.None);
+                m_CurrentFind = 0;
+            }
+            if (nextFound >= 0)
+            {
+                m_curVisibleTextBox.ScrollToCaret();
+            }
+
+            Win32Utils.ResumeDrawing(m_curVisibleTextBox);
+
+            UpdateFindCountDisplay();
+
+            findNextButton.Enabled = true;
+            findPrevButton.Enabled = true;
+        }
+
+        
+        private void findNextButton_Click(object sender, EventArgs e)
+        {
+            int index = -1;
+            if ((m_curVisibleTextBox.SelectionStart + findTextBox.TextLength) < m_curVisibleTextBox.TextLength)
+            {
+                index = m_curVisibleTextBox.Find(findTextBox.Text, m_curVisibleTextBox.SelectionStart + findTextBox.TextLength, -1, RichTextBoxFinds.None);
+            }    
+
+            if (index < 0)
+            {
+                // Wrap
+                index = m_curVisibleTextBox.Find(findTextBox.Text, 0, m_curVisibleTextBox.SelectionStart + findTextBox.TextLength, RichTextBoxFinds.None);
+                m_CurrentFind = 0;
+            }
+            else
+            {
+                m_CurrentFind++;
+            }
+            UpdateFindCountDisplay();
+        }
+
+        private void findPrevButton_Click(object sender, EventArgs e)
+        {
+            int index = m_curVisibleTextBox.Find(findTextBox.Text, 0, m_curVisibleTextBox.SelectionStart, RichTextBoxFinds.Reverse);
+            if (index < 0)
+            {
+                // Wrap
+                index = m_curVisibleTextBox.Find(findTextBox.Text, m_curVisibleTextBox.SelectionStart, -1, RichTextBoxFinds.Reverse);
+                m_CurrentFind = (m_TotalFinds - 1); // - 1 because m_CurrentFind is zero-based.
+            }
+            else
+            {
+                m_CurrentFind--;
+            }
+            UpdateFindCountDisplay();
+        }
+
+        private void UpdateFindCountDisplay()
+        {
+            if (m_CurrentFind >= m_TotalFinds)
+            {
+                findCountLabel.Text = String.Format("{0:n0}/{1:n0}", m_TotalFinds.ToString(), m_TotalFinds.ToString());
+            }
+            else
+            {
+                findCountLabel.Text = String.Format("{0:n0}/{1:n0}", (m_CurrentFind+1).ToString(), m_TotalFinds.ToString());
+            }
         }
     }
 }
