@@ -55,7 +55,9 @@ namespace Batchery
             this.errTextBox = new System.Windows.Forms.RichTextBox();
             this.runButton = new System.Windows.Forms.Button();
             this.batchFilesTab = new System.Windows.Forms.TabPage();
+            this.optionsPanel = new System.Windows.Forms.Panel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.optionsButton = new System.Windows.Forms.Button();
             this.addButton = new System.Windows.Forms.Button();
             this.removeButton = new System.Windows.Forms.Button();
             this.editButton = new System.Windows.Forms.Button();
@@ -73,6 +75,7 @@ namespace Batchery
             this.moveDownToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.editInNotepadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsPage = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.detectLinksLabel = new System.Windows.Forms.Label();
@@ -394,6 +397,7 @@ namespace Batchery
             // 
             this.batchFilesTab.BackColor = System.Drawing.Color.WhiteSmoke;
             this.batchFilesTab.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.batchFilesTab.Controls.Add(this.optionsPanel);
             this.batchFilesTab.Controls.Add(this.tableLayoutPanel2);
             this.batchFilesTab.Controls.Add(this.tableLayoutPanel1);
             this.batchFilesTab.Controls.Add(this.batchCheckedListBox);
@@ -404,16 +408,27 @@ namespace Batchery
             this.batchFilesTab.TabIndex = 1;
             this.batchFilesTab.Text = "Batch Files";
             // 
+            // optionsPanel
+            // 
+            this.optionsPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.optionsPanel.Location = new System.Drawing.Point(462, 46);
+            this.optionsPanel.Name = "optionsPanel";
+            this.optionsPanel.Size = new System.Drawing.Size(300, 346);
+            this.optionsPanel.TabIndex = 3;
+            // 
             // tableLayoutPanel2
             // 
             this.tableLayoutPanel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel2.AutoSize = true;
             this.tableLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.tableLayoutPanel2.ColumnCount = 3;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33332F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            this.tableLayoutPanel2.ColumnCount = 4;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel2.Controls.Add(this.optionsButton, 3, 0);
             this.tableLayoutPanel2.Controls.Add(this.addButton, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.removeButton, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.editButton, 2, 0);
@@ -422,8 +437,22 @@ namespace Batchery
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(587, 33);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(756, 33);
             this.tableLayoutPanel2.TabIndex = 2;
+            // 
+            // optionsButton
+            // 
+            this.optionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.optionsButton.Enabled = false;
+            this.optionsButton.Location = new System.Drawing.Point(570, 3);
+            this.optionsButton.Name = "optionsButton";
+            this.optionsButton.Size = new System.Drawing.Size(183, 27);
+            this.optionsButton.TabIndex = 3;
+            this.optionsButton.Text = "Hide Options";
+            this.optionsButton.UseVisualStyleBackColor = true;
+            this.optionsButton.Click += new System.EventHandler(this.optionsButton_Click);
             // 
             // addButton
             // 
@@ -432,7 +461,7 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Right)));
             this.addButton.Location = new System.Drawing.Point(3, 3);
             this.addButton.Name = "addButton";
-            this.addButton.Size = new System.Drawing.Size(189, 27);
+            this.addButton.Size = new System.Drawing.Size(183, 27);
             this.addButton.TabIndex = 0;
             this.addButton.Text = "Add";
             this.addButton.UseVisualStyleBackColor = true;
@@ -444,9 +473,9 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.removeButton.Enabled = false;
-            this.removeButton.Location = new System.Drawing.Point(198, 3);
+            this.removeButton.Location = new System.Drawing.Point(192, 3);
             this.removeButton.Name = "removeButton";
-            this.removeButton.Size = new System.Drawing.Size(189, 27);
+            this.removeButton.Size = new System.Drawing.Size(183, 27);
             this.removeButton.TabIndex = 1;
             this.removeButton.Text = "Remove";
             this.removeButton.UseVisualStyleBackColor = true;
@@ -458,9 +487,9 @@ namespace Batchery
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.editButton.Enabled = false;
-            this.editButton.Location = new System.Drawing.Point(393, 3);
+            this.editButton.Location = new System.Drawing.Point(381, 3);
             this.editButton.Name = "editButton";
-            this.editButton.Size = new System.Drawing.Size(191, 27);
+            this.editButton.Size = new System.Drawing.Size(183, 27);
             this.editButton.TabIndex = 2;
             this.editButton.Text = "Edit in Notepad";
             this.editButton.UseVisualStyleBackColor = true;
@@ -524,7 +553,7 @@ namespace Batchery
             this.batchCheckedListBox.Location = new System.Drawing.Point(44, 46);
             this.batchCheckedListBox.Name = "batchCheckedListBox";
             this.batchCheckedListBox.ScrollAlwaysVisible = true;
-            this.batchCheckedListBox.Size = new System.Drawing.Size(715, 346);
+            this.batchCheckedListBox.Size = new System.Drawing.Size(415, 346);
             this.batchCheckedListBox.TabIndex = 0;
             this.batchCheckedListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.batchList_ItemCheck);
             this.batchCheckedListBox.SelectedIndexChanged += new System.EventHandler(this.batchList_SelectedIndexChanged);
@@ -542,34 +571,35 @@ namespace Batchery
             this.moveUpToolStripMenuItem,
             this.moveDownToolStripMenuItem,
             this.toolStripSeparator3,
-            this.editInNotepadToolStripMenuItem});
+            this.editInNotepadToolStripMenuItem,
+            this.optionsToolStripMenuItem});
             this.contextMenuStrip2.Name = "contextMenuStrip2";
-            this.contextMenuStrip2.Size = new System.Drawing.Size(157, 170);
+            this.contextMenuStrip2.Size = new System.Drawing.Size(181, 214);
             this.contextMenuStrip2.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuStrip2_Opening);
             // 
             // selectAllToolStripMenuItem
             // 
             this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.selectAllToolStripMenuItem.Text = "Check All";
             this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.checkAllToolStripMenuItem_Click);
             // 
             // deselectAllToolStripMenuItem
             // 
             this.deselectAllToolStripMenuItem.Name = "deselectAllToolStripMenuItem";
-            this.deselectAllToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.deselectAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.deselectAllToolStripMenuItem.Text = "Uncheck All";
             this.deselectAllToolStripMenuItem.Click += new System.EventHandler(this.uncheckAllToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(153, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
             // 
             // addToolStripMenuItem
             // 
             this.addToolStripMenuItem.Name = "addToolStripMenuItem";
-            this.addToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.addToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addToolStripMenuItem.Text = "Add";
             this.addToolStripMenuItem.Click += new System.EventHandler(this.addToolStripMenuItem_Click);
             // 
@@ -577,7 +607,7 @@ namespace Batchery
             // 
             this.removeToolStripMenuItem.Enabled = false;
             this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
-            this.removeToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.removeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.removeToolStripMenuItem.Text = "Remove";
             this.removeToolStripMenuItem.Click += new System.EventHandler(this.removeToolStripMenuItem_Click);
             // 
@@ -585,7 +615,7 @@ namespace Batchery
             // 
             this.moveUpToolStripMenuItem.Enabled = false;
             this.moveUpToolStripMenuItem.Name = "moveUpToolStripMenuItem";
-            this.moveUpToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.moveUpToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.moveUpToolStripMenuItem.Text = "Move Up";
             this.moveUpToolStripMenuItem.Click += new System.EventHandler(this.moveUpToolStripMenuItem_Click);
             // 
@@ -593,22 +623,30 @@ namespace Batchery
             // 
             this.moveDownToolStripMenuItem.Enabled = false;
             this.moveDownToolStripMenuItem.Name = "moveDownToolStripMenuItem";
-            this.moveDownToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.moveDownToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.moveDownToolStripMenuItem.Text = "Move Down";
             this.moveDownToolStripMenuItem.Click += new System.EventHandler(this.moveDownToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(153, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
             // 
             // editInNotepadToolStripMenuItem
             // 
             this.editInNotepadToolStripMenuItem.Enabled = false;
             this.editInNotepadToolStripMenuItem.Name = "editInNotepadToolStripMenuItem";
-            this.editInNotepadToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.editInNotepadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.editInNotepadToolStripMenuItem.Text = "Edit in Notepad";
             this.editInNotepadToolStripMenuItem.Click += new System.EventHandler(this.editInNotepadToolStripMenuItem_Click);
+            // 
+            // optionsToolStripMenuItem
+            // 
+            this.optionsToolStripMenuItem.Enabled = false;
+            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.optionsToolStripMenuItem.Text = "Hide Options";
+            this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsButton_Click);
             // 
             // settingsPage
             // 
@@ -859,6 +897,9 @@ namespace Batchery
         private System.Windows.Forms.CheckBox injectBatcheryOutputCheckBox;
         private System.Windows.Forms.Label injectBatcheryOutputLabel;
         private System.Windows.Forms.Label findCountLabel;
+        private System.Windows.Forms.Button optionsButton;
+        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
+        private System.Windows.Forms.Panel optionsPanel;
     }
 }
 

@@ -34,11 +34,27 @@ namespace Batchery
         private int m_TotalFinds = 0;
         private int m_CurrentFind = 0;
 
+        private bool m_OptionsShown = true;
+
         enum MainTabControlIndices : int
         {
             Output = 0,
             BatchFiles,
             Settings,
+        }
+
+        enum ContextMenu2Indices : int
+        {
+            CheckAll = 0,
+            UncheckAll,
+            Separator1,
+            Add,
+            Remove,
+            Up,
+            Down,
+            Separator2,
+            Edit,
+            Options,
         }
 
         public MainForm()
@@ -56,6 +72,8 @@ namespace Batchery
             m_OutputFont = new Font(fonts.Families[0], 10.0F);
 
             m_batchManager = new BatchManager(batchCheckedListBox);
+
+            HideOptions();
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
@@ -564,14 +582,14 @@ namespace Batchery
             // Check/Uncheck All
             if (batchCheckedListBox.Items.Count == 0)
             {
-                contextMenuStrip2.Items[0].Enabled = false;
+                contextMenuStrip2.Items[(int)ContextMenu2Indices.CheckAll].Enabled = false;
             }
             else
             {
                 bool allChecked = (batchCheckedListBox.CheckedItems.Count == batchCheckedListBox.Items.Count);
-                contextMenuStrip2.Items[0].Enabled = (!allChecked);
+                contextMenuStrip2.Items[(int)ContextMenu2Indices.CheckAll].Enabled = (!allChecked);
             }
-            contextMenuStrip2.Items[1].Enabled = (batchCheckedListBox.CheckedItems.Count > 0);
+            contextMenuStrip2.Items[(int)ContextMenu2Indices.UncheckAll].Enabled = (batchCheckedListBox.CheckedItems.Count > 0);
 
             // Item 2 is a separator
 
@@ -581,18 +599,26 @@ namespace Batchery
             bool validItemHighlighted = ((batchCheckedListBox.Items.Count > 0) && (batchCheckedListBox.SelectedItem != null));
 
             removeButton.Enabled = validItemHighlighted;
-            contextMenuStrip2.Items[4].Enabled = validItemHighlighted;
+            contextMenuStrip2.Items[(int)ContextMenu2Indices.Remove].Enabled = validItemHighlighted;
 
             upButton.Enabled = validItemHighlighted && (batchCheckedListBox.SelectedIndex != 0);
-            contextMenuStrip2.Items[5].Enabled = validItemHighlighted && (batchCheckedListBox.SelectedIndex != 0);
+            contextMenuStrip2.Items[(int)ContextMenu2Indices.Up].Enabled = validItemHighlighted && (batchCheckedListBox.SelectedIndex != 0);
 
             downButton.Enabled = validItemHighlighted && (batchCheckedListBox.SelectedIndex != (batchCheckedListBox.Items.Count - 1));
-            contextMenuStrip2.Items[6].Enabled = validItemHighlighted && (batchCheckedListBox.SelectedIndex != (batchCheckedListBox.Items.Count - 1));
+            contextMenuStrip2.Items[(int)ContextMenu2Indices.Down].Enabled = validItemHighlighted && (batchCheckedListBox.SelectedIndex != (batchCheckedListBox.Items.Count - 1));
 
             // Item 7 is a separator
 
             editButton.Enabled = validItemHighlighted;
-            contextMenuStrip2.Items[8].Enabled = validItemHighlighted;
+            contextMenuStrip2.Items[(int)ContextMenu2Indices.Edit].Enabled = validItemHighlighted;
+
+            optionsButton.Enabled = validItemHighlighted;
+            contextMenuStrip2.Items[(int)ContextMenu2Indices.Options].Enabled = validItemHighlighted;
+
+            if ((validItemHighlighted == false) && (m_OptionsShown))
+            {
+                HideOptions();
+            }
         }
 
         private void LinkClicked(object sender, System.Windows.Forms.LinkClickedEventArgs e)
@@ -609,6 +635,11 @@ namespace Batchery
         private void OnMainTabChanged(object sender, EventArgs e)
         {
             CloseFindPanel(sender, e);
+
+            if (m_OptionsShown)
+            {
+                HideOptions();
+            }
         }
 
         private void OpenFindPanel(object sender, EventArgs e)
@@ -791,6 +822,36 @@ namespace Batchery
             {
                 findCountLabel.Text = String.Format("{0:n0}/{1:n0}", (m_CurrentFind+1).ToString(), m_TotalFinds.ToString());
             }
+        }
+
+        private void optionsButton_Click(object sender, EventArgs e)
+        {
+            if (m_OptionsShown)
+            {
+                HideOptions();
+            }
+            else
+            {
+                ShowOptions();
+            }
+        }
+
+        private void HideOptions()
+        {
+            m_OptionsShown = false;
+            batchCheckedListBox.Width += 300;
+            optionsPanel.Visible = false;
+            optionsButton.Text = "Show Options";
+            contextMenuStrip2.Items[(int)ContextMenu2Indices.Options].Text = "Show Options";
+        }
+
+        private void ShowOptions()
+        {
+            m_OptionsShown = true;
+            batchCheckedListBox.Width -= 300;
+            optionsPanel.Visible = true;
+            optionsButton.Text = "Hide Options";
+            contextMenuStrip2.Items[(int)ContextMenu2Indices.Options].Text = "Hide Options";
         }
     }
 }
