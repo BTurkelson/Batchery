@@ -8,10 +8,7 @@
     <Setting Name="Width" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">816</Value>
     </Setting>
-    <Setting Name="BatchFiles" Type="System.String[]" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="SelectedBatchIndices" Type="System.Int32[]" Scope="User">
+    <Setting Name="SerializedBatchItems" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="DetectLinks" Type="System.Boolean" Scope="User">

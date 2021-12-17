@@ -203,15 +203,15 @@ namespace Batchery
             }
         }
 
-        private void onBatchRunFile(string file, int stepIdx, int numSteps)
+        private void onBatchRunFile(string stepName, int stepIdx, int numSteps)
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new Action<string, int, int>(onBatchRunFile), file, stepIdx, numSteps);
+                this.Invoke(new Action<string, int, int>(onBatchRunFile), stepName, stepIdx, numSteps);
             }
             else
             {
-                textProgressBar.CustomText = "(" + stepIdx.ToString() + "/" + numSteps.ToString() + ") " + file;
+                textProgressBar.CustomText = "(" + stepIdx.ToString() + "/" + numSteps.ToString() + ") " + stepName;
                 textProgressBar.Value = stepIdx;
                 textProgressBar.Maximum = numSteps;
             }
@@ -839,8 +839,7 @@ namespace Batchery
         private void HideOptions()
         {
             m_OptionsShown = false;
-            batchCheckedListBox.Width += 300;
-            optionsPanel.Visible = false;
+            batchSplitContainer.Panel2Collapsed = true;
             optionsButton.Text = "Show Options";
             contextMenuStrip2.Items[(int)ContextMenu2Indices.Options].Text = "Show Options";
         }
@@ -848,8 +847,7 @@ namespace Batchery
         private void ShowOptions()
         {
             m_OptionsShown = true;
-            batchCheckedListBox.Width -= 300;
-            optionsPanel.Visible = true;
+            batchSplitContainer.Panel2Collapsed = false;
             optionsButton.Text = "Hide Options";
             contextMenuStrip2.Items[(int)ContextMenu2Indices.Options].Text = "Hide Options";
         }

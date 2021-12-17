@@ -55,15 +55,7 @@ namespace Batchery
             this.errTextBox = new System.Windows.Forms.RichTextBox();
             this.runButton = new System.Windows.Forms.Button();
             this.batchFilesTab = new System.Windows.Forms.TabPage();
-            this.optionsPanel = new System.Windows.Forms.Panel();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.optionsButton = new System.Windows.Forms.Button();
-            this.addButton = new System.Windows.Forms.Button();
-            this.removeButton = new System.Windows.Forms.Button();
-            this.editButton = new System.Windows.Forms.Button();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.upButton = new System.Windows.Forms.Button();
-            this.downButton = new System.Windows.Forms.Button();
+            this.batchSplitContainer = new System.Windows.Forms.SplitContainer();
             this.batchCheckedListBox = new System.Windows.Forms.CheckedListBox();
             this.contextMenuStrip2 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -76,6 +68,14 @@ namespace Batchery
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.editInNotepadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.optionsButton = new System.Windows.Forms.Button();
+            this.addButton = new System.Windows.Forms.Button();
+            this.removeButton = new System.Windows.Forms.Button();
+            this.editButton = new System.Windows.Forms.Button();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.upButton = new System.Windows.Forms.Button();
+            this.downButton = new System.Windows.Forms.Button();
             this.settingsPage = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.detectLinksLabel = new System.Windows.Forms.Label();
@@ -99,9 +99,12 @@ namespace Batchery
             this.contextMenuStrip1.SuspendLayout();
             this.stdErrTab.SuspendLayout();
             this.batchFilesTab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.batchSplitContainer)).BeginInit();
+            this.batchSplitContainer.Panel1.SuspendLayout();
+            this.batchSplitContainer.SuspendLayout();
+            this.contextMenuStrip2.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
-            this.contextMenuStrip2.SuspendLayout();
             this.settingsPage.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.SuspendLayout();
@@ -397,10 +400,9 @@ namespace Batchery
             // 
             this.batchFilesTab.BackColor = System.Drawing.Color.WhiteSmoke;
             this.batchFilesTab.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.batchFilesTab.Controls.Add(this.optionsPanel);
+            this.batchFilesTab.Controls.Add(this.batchSplitContainer);
             this.batchFilesTab.Controls.Add(this.tableLayoutPanel2);
             this.batchFilesTab.Controls.Add(this.tableLayoutPanel1);
-            this.batchFilesTab.Controls.Add(this.batchCheckedListBox);
             this.batchFilesTab.Location = new System.Drawing.Point(4, 24);
             this.batchFilesTab.Name = "batchFilesTab";
             this.batchFilesTab.Padding = new System.Windows.Forms.Padding(3);
@@ -408,14 +410,126 @@ namespace Batchery
             this.batchFilesTab.TabIndex = 1;
             this.batchFilesTab.Text = "Batch Files";
             // 
-            // optionsPanel
+            // batchSplitContainer
             // 
-            this.optionsPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.batchSplitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.optionsPanel.Location = new System.Drawing.Point(462, 46);
-            this.optionsPanel.Name = "optionsPanel";
-            this.optionsPanel.Size = new System.Drawing.Size(300, 346);
-            this.optionsPanel.TabIndex = 3;
+            this.batchSplitContainer.Cursor = System.Windows.Forms.Cursors.Default;
+            this.batchSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+            this.batchSplitContainer.Location = new System.Drawing.Point(42, 46);
+            this.batchSplitContainer.Name = "batchSplitContainer";
+            // 
+            // batchSplitContainer.Panel1
+            // 
+            this.batchSplitContainer.Panel1.Controls.Add(this.batchCheckedListBox);
+            this.batchSplitContainer.Panel1MinSize = 100;
+            this.batchSplitContainer.Panel2MinSize = 100;
+            this.batchSplitContainer.Size = new System.Drawing.Size(717, 340);
+            this.batchSplitContainer.SplitterDistance = 363;
+            this.batchSplitContainer.TabIndex = 4;
+            // 
+            // batchCheckedListBox
+            // 
+            this.batchCheckedListBox.AllowDrop = true;
+            this.batchCheckedListBox.ContextMenuStrip = this.contextMenuStrip2;
+            this.batchCheckedListBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.batchCheckedListBox.FormattingEnabled = true;
+            this.batchCheckedListBox.Location = new System.Drawing.Point(0, 0);
+            this.batchCheckedListBox.Name = "batchCheckedListBox";
+            this.batchCheckedListBox.ScrollAlwaysVisible = true;
+            this.batchCheckedListBox.Size = new System.Drawing.Size(363, 340);
+            this.batchCheckedListBox.TabIndex = 1;
+            this.batchCheckedListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.batchList_ItemCheck);
+            this.batchCheckedListBox.SelectedIndexChanged += new System.EventHandler(this.batchList_SelectedIndexChanged);
+            // 
+            // contextMenuStrip2
+            // 
+            this.contextMenuStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectAllToolStripMenuItem,
+            this.deselectAllToolStripMenuItem,
+            this.toolStripSeparator2,
+            this.addToolStripMenuItem,
+            this.removeToolStripMenuItem,
+            this.moveUpToolStripMenuItem,
+            this.moveDownToolStripMenuItem,
+            this.toolStripSeparator3,
+            this.editInNotepadToolStripMenuItem,
+            this.optionsToolStripMenuItem});
+            this.contextMenuStrip2.Name = "contextMenuStrip2";
+            this.contextMenuStrip2.Size = new System.Drawing.Size(157, 192);
+            this.contextMenuStrip2.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuStrip2_Opening);
+            // 
+            // selectAllToolStripMenuItem
+            // 
+            this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.selectAllToolStripMenuItem.Text = "Check All";
+            this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.checkAllToolStripMenuItem_Click);
+            // 
+            // deselectAllToolStripMenuItem
+            // 
+            this.deselectAllToolStripMenuItem.Name = "deselectAllToolStripMenuItem";
+            this.deselectAllToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.deselectAllToolStripMenuItem.Text = "Uncheck All";
+            this.deselectAllToolStripMenuItem.Click += new System.EventHandler(this.uncheckAllToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(153, 6);
+            // 
+            // addToolStripMenuItem
+            // 
+            this.addToolStripMenuItem.Name = "addToolStripMenuItem";
+            this.addToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.addToolStripMenuItem.Text = "Add";
+            this.addToolStripMenuItem.Click += new System.EventHandler(this.addToolStripMenuItem_Click);
+            // 
+            // removeToolStripMenuItem
+            // 
+            this.removeToolStripMenuItem.Enabled = false;
+            this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
+            this.removeToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.removeToolStripMenuItem.Text = "Remove";
+            this.removeToolStripMenuItem.Click += new System.EventHandler(this.removeToolStripMenuItem_Click);
+            // 
+            // moveUpToolStripMenuItem
+            // 
+            this.moveUpToolStripMenuItem.Enabled = false;
+            this.moveUpToolStripMenuItem.Name = "moveUpToolStripMenuItem";
+            this.moveUpToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.moveUpToolStripMenuItem.Text = "Move Up";
+            this.moveUpToolStripMenuItem.Click += new System.EventHandler(this.moveUpToolStripMenuItem_Click);
+            // 
+            // moveDownToolStripMenuItem
+            // 
+            this.moveDownToolStripMenuItem.Enabled = false;
+            this.moveDownToolStripMenuItem.Name = "moveDownToolStripMenuItem";
+            this.moveDownToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.moveDownToolStripMenuItem.Text = "Move Down";
+            this.moveDownToolStripMenuItem.Click += new System.EventHandler(this.moveDownToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(153, 6);
+            // 
+            // editInNotepadToolStripMenuItem
+            // 
+            this.editInNotepadToolStripMenuItem.Enabled = false;
+            this.editInNotepadToolStripMenuItem.Name = "editInNotepadToolStripMenuItem";
+            this.editInNotepadToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.editInNotepadToolStripMenuItem.Text = "Edit in Notepad";
+            this.editInNotepadToolStripMenuItem.Click += new System.EventHandler(this.editInNotepadToolStripMenuItem_Click);
+            // 
+            // optionsToolStripMenuItem
+            // 
+            this.optionsToolStripMenuItem.Enabled = false;
+            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.optionsToolStripMenuItem.Text = "Hide Options";
+            this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsButton_Click);
             // 
             // tableLayoutPanel2
             // 
@@ -541,112 +655,6 @@ namespace Batchery
             this.downButton.Text = "🡇";
             this.downButton.UseVisualStyleBackColor = true;
             this.downButton.Click += new System.EventHandler(this.downButton_Click);
-            // 
-            // batchCheckedListBox
-            // 
-            this.batchCheckedListBox.AllowDrop = true;
-            this.batchCheckedListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.batchCheckedListBox.ContextMenuStrip = this.contextMenuStrip2;
-            this.batchCheckedListBox.FormattingEnabled = true;
-            this.batchCheckedListBox.Location = new System.Drawing.Point(44, 46);
-            this.batchCheckedListBox.Name = "batchCheckedListBox";
-            this.batchCheckedListBox.ScrollAlwaysVisible = true;
-            this.batchCheckedListBox.Size = new System.Drawing.Size(415, 346);
-            this.batchCheckedListBox.TabIndex = 0;
-            this.batchCheckedListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.batchList_ItemCheck);
-            this.batchCheckedListBox.SelectedIndexChanged += new System.EventHandler(this.batchList_SelectedIndexChanged);
-            this.batchCheckedListBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.dragOntoBatchList);
-            this.batchCheckedListBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.dragEnterBatchList);
-            // 
-            // contextMenuStrip2
-            // 
-            this.contextMenuStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectAllToolStripMenuItem,
-            this.deselectAllToolStripMenuItem,
-            this.toolStripSeparator2,
-            this.addToolStripMenuItem,
-            this.removeToolStripMenuItem,
-            this.moveUpToolStripMenuItem,
-            this.moveDownToolStripMenuItem,
-            this.toolStripSeparator3,
-            this.editInNotepadToolStripMenuItem,
-            this.optionsToolStripMenuItem});
-            this.contextMenuStrip2.Name = "contextMenuStrip2";
-            this.contextMenuStrip2.Size = new System.Drawing.Size(181, 214);
-            this.contextMenuStrip2.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuStrip2_Opening);
-            // 
-            // selectAllToolStripMenuItem
-            // 
-            this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.selectAllToolStripMenuItem.Text = "Check All";
-            this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.checkAllToolStripMenuItem_Click);
-            // 
-            // deselectAllToolStripMenuItem
-            // 
-            this.deselectAllToolStripMenuItem.Name = "deselectAllToolStripMenuItem";
-            this.deselectAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.deselectAllToolStripMenuItem.Text = "Uncheck All";
-            this.deselectAllToolStripMenuItem.Click += new System.EventHandler(this.uncheckAllToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
-            // 
-            // addToolStripMenuItem
-            // 
-            this.addToolStripMenuItem.Name = "addToolStripMenuItem";
-            this.addToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.addToolStripMenuItem.Text = "Add";
-            this.addToolStripMenuItem.Click += new System.EventHandler(this.addToolStripMenuItem_Click);
-            // 
-            // removeToolStripMenuItem
-            // 
-            this.removeToolStripMenuItem.Enabled = false;
-            this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
-            this.removeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.removeToolStripMenuItem.Text = "Remove";
-            this.removeToolStripMenuItem.Click += new System.EventHandler(this.removeToolStripMenuItem_Click);
-            // 
-            // moveUpToolStripMenuItem
-            // 
-            this.moveUpToolStripMenuItem.Enabled = false;
-            this.moveUpToolStripMenuItem.Name = "moveUpToolStripMenuItem";
-            this.moveUpToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.moveUpToolStripMenuItem.Text = "Move Up";
-            this.moveUpToolStripMenuItem.Click += new System.EventHandler(this.moveUpToolStripMenuItem_Click);
-            // 
-            // moveDownToolStripMenuItem
-            // 
-            this.moveDownToolStripMenuItem.Enabled = false;
-            this.moveDownToolStripMenuItem.Name = "moveDownToolStripMenuItem";
-            this.moveDownToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.moveDownToolStripMenuItem.Text = "Move Down";
-            this.moveDownToolStripMenuItem.Click += new System.EventHandler(this.moveDownToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
-            // 
-            // editInNotepadToolStripMenuItem
-            // 
-            this.editInNotepadToolStripMenuItem.Enabled = false;
-            this.editInNotepadToolStripMenuItem.Name = "editInNotepadToolStripMenuItem";
-            this.editInNotepadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.editInNotepadToolStripMenuItem.Text = "Edit in Notepad";
-            this.editInNotepadToolStripMenuItem.Click += new System.EventHandler(this.editInNotepadToolStripMenuItem_Click);
-            // 
-            // optionsToolStripMenuItem
-            // 
-            this.optionsToolStripMenuItem.Enabled = false;
-            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.optionsToolStripMenuItem.Text = "Hide Options";
-            this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsButton_Click);
             // 
             // settingsPage
             // 
@@ -828,9 +836,12 @@ namespace Batchery
             this.stdErrTab.ResumeLayout(false);
             this.batchFilesTab.ResumeLayout(false);
             this.batchFilesTab.PerformLayout();
+            this.batchSplitContainer.Panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.batchSplitContainer)).EndInit();
+            this.batchSplitContainer.ResumeLayout(false);
+            this.contextMenuStrip2.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
-            this.contextMenuStrip2.ResumeLayout(false);
             this.settingsPage.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel3.PerformLayout();
@@ -856,7 +867,6 @@ namespace Batchery
         private System.Windows.Forms.TabPage stdErrTab;
         private System.Windows.Forms.RichTextBox errTextBox;
         private System.Windows.Forms.Button cancelButton;
-        private System.Windows.Forms.CheckedListBox batchCheckedListBox;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.Button upButton;
@@ -899,7 +909,8 @@ namespace Batchery
         private System.Windows.Forms.Label findCountLabel;
         private System.Windows.Forms.Button optionsButton;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
-        private System.Windows.Forms.Panel optionsPanel;
+        private System.Windows.Forms.SplitContainer batchSplitContainer;
+        private System.Windows.Forms.CheckedListBox batchCheckedListBox;
     }
 }
 

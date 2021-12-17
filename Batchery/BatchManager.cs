@@ -11,7 +11,7 @@ namespace Batchery
         public delegate void OnEndCallback(int exitCode);
         private OnEndCallback m_onEndCallback;
 
-        public delegate void OnRunFileCallback(string fileName, int stepIdx, int numSteps);
+        public delegate void OnRunFileCallback(string stepName, int stepIdx, int numSteps);
         private OnRunFileCallback m_onRunFileCallback;
 
         public delegate void OnTextRecievedCallback(string text);
@@ -24,7 +24,7 @@ namespace Batchery
         private System.Windows.Forms.CheckedListBox m_listBox;
         private bool m_suspendBatchListItemCheck = false;
 
-        private Queue<string> m_BatchFiles = new Queue<string>();
+        private Queue<BatchItem> m_BatchFiles = new Queue<BatchItem>();
         private System.Diagnostics.Process m_BatchProcess;
 
         private int m_stepIdx = 0;
@@ -33,6 +33,7 @@ namespace Batchery
         public BatchManager(System.Windows.Forms.CheckedListBox listBox)
         {
             m_listBox = listBox;
+            m_listBox.DisplayMember = "DisplayName";
         }
 
         public void OnRun(OnEndCallback onEnd, OnRunFileCallback onRunFile, OnTextRecievedCallback stdOutCallback, OnTextRecievedCallback stdErrCallback, OnStatusRecievedCallback statusCallback)
@@ -50,9 +51,9 @@ namespace Batchery
                 m_numSteps = m_listBox.CheckedItems.Count;
                 m_stepIdx = 0;
 
-                foreach (string file in m_listBox.CheckedItems)
+                foreach (BatchItem item in m_listBox.CheckedItems)
                 {
-                    m_BatchFiles.Enqueue(file);
+                    m_BatchFiles.Enqueue(item);
                 }
 
                 m_BatchProcess = new System.Diagnostics.Process();
@@ -92,15 +93,15 @@ namespace Batchery
 
         private void RunNext()
         {
-            string file = m_BatchFiles.Dequeue();
+            BatchItem item = m_BatchFiles.Dequeue();
 
-            OnStatus("Starting " + file, false);
+            OnStatus("Starting " + item.DisplayName, false);
 
-            m_BatchProcess.StartInfo.FileName = file;
-            m_BatchProcess.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(file);
+            m_BatchProcess.StartInfo.FileName = item.FilePath;
+            m_BatchProcess.StartInfo.WorkingDirectory = item.WorkingDirectory;
 
             m_stepIdx++;
-            m_onRunFileCallback(file, m_stepIdx, m_numSteps);
+            m_onRunFileCallback(item.DisplayName, m_stepIdx, m_numSteps);
 
             try
             {
@@ -193,19 +194,12 @@ namespace Batchery
         {
             m_suspendBatchListItemCheck = true;
 
-            if (SessionSettings.Default.BatchFiles != null)
+            if (SessionSettings.Default.SerializedBatchItems.Length > 0)
             {
-                foreach (string file in SessionSettings.Default.BatchFiles)
+                BatchItem[] items = BatchItem.DeserializeArray(SessionSettings.Default.SerializedBatchItems);
+                foreach (BatchItem item in items)
                 {
-                    m_listBox.Items.Add(file);
-                }
-            }
-
-            if (SessionSettings.Default.SelectedBatchIndices != null)
-            {
-                foreach (int index in SessionSettings.Default.SelectedBatchIndices)
-                {
-                    m_listBox.SetItemChecked(index, true);
+                    m_listBox.Items.Add(item, item.IsChecked);
                 }
             }
 
@@ -214,21 +208,7 @@ namespace Batchery
 
         public void SaveToSettings()
         {
-            string[] files = new string[m_listBox.Items.Count];
-            int i = 0;
-            foreach (string file in m_listBox.Items)
-            {
-                files[i++] = file;
-            }
-            SessionSettings.Default.BatchFiles = files;
-
-            Int32[] checkedIndices = new Int32[m_listBox.CheckedItems.Count];
-            i = 0;
-            foreach (int index in m_listBox.CheckedIndices)
-            {
-                checkedIndices[i++] = index;
-            }
-            SessionSettings.Default.SelectedBatchIndices = checkedIndices;
+            SessionSettings.Default.SerializedBatchItems = BatchItem.SerializeArray(m_listBox.CheckedItems.Cast<BatchItem>().ToArray());
         }
 
         public void OnAdd(object sender, EventArgs e)
@@ -243,7 +223,7 @@ namespace Batchery
 
             foreach (string file in openFileDialog.FileNames)
             {
-                m_listBox.Items.Add(file);
+                m_listBox.Items.Add(new BatchItem(file));
             }
         }
 
@@ -260,7 +240,7 @@ namespace Batchery
             string[] files = (string[])e.Data.GetData(System.Windows.Forms.DataFormats.FileDrop);
             foreach (string file in files)
             { 
-                m_listBox.Items.Add(file);
+                m_listBox.Items.Add(new BatchItem(file));
             }
         }
 
@@ -271,7 +251,7 @@ namespace Batchery
 
         public void OnEdit(object sender, EventArgs e)
         {
-            string fullPath = System.IO.Path.GetFullPath(m_listBox.SelectedItem.ToString());
+            string fullPath = System.IO.Path.GetFullPath(((BatchItem)m_listBox.SelectedItem).FilePath);
             if (CheckIfFileExists(fullPath))
             {
                 System.Diagnostics.Process proc = System.Diagnostics.Process.Start("Notepad.exe", fullPath);
@@ -348,6 +328,8 @@ namespace Batchery
                     m_listBox.ClearSelected();
                 }
             }
+
+            ((BatchItem)(m_listBox.Items[e.Index])).IsChecked = (e.NewValue == System.Windows.Forms.CheckState.Checked);
         }
 
         private bool CheckIfFileExists(string file)
