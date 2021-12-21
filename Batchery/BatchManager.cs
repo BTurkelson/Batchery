@@ -266,13 +266,21 @@ namespace Batchery
             m_listBox.Items.RemoveAt(m_listBox.SelectedIndex);
         }
 
+        private string AddQuotesIfRequired(string path)
+        {
+            return !string.IsNullOrWhiteSpace(path) ?
+                path.Contains(" ") && (!path.StartsWith("\"") && !path.EndsWith("\"")) ?
+                    "\"" + path + "\"" : path :
+                    string.Empty;
+        }
+
         public void OnEdit(object sender, EventArgs e)
         {
             string editor = System.IO.Path.GetFullPath(((BatchItem)m_listBox.SelectedItem).Editor);
             string fullPath = System.IO.Path.GetFullPath(((BatchItem)m_listBox.SelectedItem).FileToEdit);
             if (CheckIfFileExists(editor) && CheckIfFileExists(fullPath))
             {
-                System.Diagnostics.Process proc = System.Diagnostics.Process.Start(editor, fullPath);
+                System.Diagnostics.Process proc = System.Diagnostics.Process.Start(editor, AddQuotesIfRequired(fullPath));
             }
         }
 
