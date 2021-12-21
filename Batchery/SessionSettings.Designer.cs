@@ -12,7 +12,7 @@ namespace Batchery {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.0.3.0")]
     internal sealed partial class SessionSettings : global::System.Configuration.ApplicationSettingsBase {
         
         private static SessionSettings defaultInstance = ((SessionSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new SessionSettings())));
@@ -49,23 +49,13 @@ namespace Batchery {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public string[] BatchFiles {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SerializedBatchItems {
             get {
-                return ((string[])(this["BatchFiles"]));
+                return ((string)(this["SerializedBatchItems"]));
             }
             set {
-                this["BatchFiles"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public int[] SelectedBatchIndices {
-            get {
-                return ((int[])(this["SelectedBatchIndices"]));
-            }
-            set {
-                this["SelectedBatchIndices"] = value;
+                this["SerializedBatchItems"] = value;
             }
         }
         
@@ -114,6 +104,18 @@ namespace Batchery {
             }
             set {
                 this["InjectBatcheryOutput"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DetectFindResults {
+            get {
+                return ((bool)(this["DetectFindResults"]));
+            }
+            set {
+                this["DetectFindResults"] = value;
             }
         }
     }
