@@ -216,6 +216,8 @@ namespace Batchery
 
                 if (exitCode == 0)
                 {
+                    TaskbarProgress.SetState(this.Handle, TaskbarProgress.TaskbarStates.NoProgress);
+
                     textProgressBar.Maximum = 1;
                     textProgressBar.Value = 1;
                     textProgressBar.ProgressColor = m_GoodColor;
@@ -225,6 +227,8 @@ namespace Batchery
                 }
                 else
                 {
+                    TaskbarProgress.SetState(this.Handle, TaskbarProgress.TaskbarStates.Error);
+
                     textProgressBar.Maximum = 1;
                     textProgressBar.Value = 1;
                     textProgressBar.ProgressColor = m_BadColor;
@@ -257,6 +261,9 @@ namespace Batchery
             }
             else
             {
+                TaskbarProgress.SetState(this.Handle, TaskbarProgress.TaskbarStates.Normal);
+                TaskbarProgress.SetValue(this.Handle, stepIdx, numSteps);
+
                 m_progressBarTextWithoutTime = "(" + stepIdx.ToString() + "/" + numSteps.ToString() + ") " + stepName;
                 textProgressBar.Maximum = numSteps;
                 textProgressBar.Value = stepIdx;
