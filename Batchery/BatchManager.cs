@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,10 +27,12 @@ namespace Batchery
 
         private Queue<(BatchItem, int)> m_BatchFiles = new Queue<(BatchItem, int)>();
         private (BatchItem, int) m_RunningTuple = (null, 0);
-        private System.Diagnostics.Process m_BatchProcess;
+        private Process m_BatchProcess;
 
         private int m_stepIdx = 0;
         private int m_numSteps = 0;
+
+        private Stopwatch m_stepStopwatch;
 
         public BatchManager(System.Windows.Forms.CheckedListBox listBox)
         {
@@ -60,7 +63,7 @@ namespace Batchery
                 m_numSteps = m_BatchFiles.Count;
                 m_stepIdx = 0;
 
-                m_BatchProcess = new System.Diagnostics.Process();
+                m_BatchProcess = new Process();
 
                 m_BatchProcess.StartInfo.UseShellExecute = false;
                 m_BatchProcess.StartInfo.CreateNoWindow = true;
@@ -88,6 +91,11 @@ namespace Batchery
 
         private void ClearCallbacks()
         {
+            if (m_stepStopwatch != null)
+            {
+                m_stepStopwatch.Stop();
+            }
+
             m_onEndCallback = null;
             m_onRunFileCallback = null;
             m_onStdOutRecievedCallback = null;
@@ -119,6 +127,8 @@ namespace Batchery
 
             m_onRunFileCallback(item.DisplayName, m_stepIdx, m_numSteps);
 
+            m_stepStopwatch = Stopwatch.StartNew();
+
             try
             {
                 m_BatchProcess.Start();
@@ -144,11 +154,15 @@ namespace Batchery
             m_BatchProcess.CancelOutputRead();
             m_BatchProcess.CancelErrorRead();
 
+            m_stepStopwatch.Stop();
+            TimeSpan elapsedTime = m_stepStopwatch.Elapsed;
+            string elapsedTimeString = elapsedTime.ToString(@"mm\:ss\.ff");
+
             int exitCode = -1;
             if (m_BatchProcess.HasExited)
             {
                 exitCode = m_BatchProcess.ExitCode;
-                OnStatus("Exited with code: " + m_BatchProcess.ExitCode, (exitCode != 0));
+                OnStatus("Exited in " + elapsedTimeString + " with code: " + m_BatchProcess.ExitCode, (exitCode != 0));
             }
 
             bool endNow = true;

@@ -36,6 +36,10 @@ namespace Batchery
 
         private bool m_OptionsShown = true;
 
+        private System.Timers.Timer m_RunTimer;
+        private string m_progressBarTextWithoutTime;
+        private DateTime m_StartTime;
+
         enum OptionsBrowseButtonsEnum
         {
             FilePath,
@@ -81,9 +85,19 @@ namespace Batchery
 
             m_batchManager = new BatchManager(batchCheckedListBox);
 
+            m_RunTimer = new System.Timers.Timer();
+            m_RunTimer.Interval = 1000;
+            m_RunTimer.AutoReset = true;
+            m_RunTimer.Elapsed += OnRunTimerTick;
+
             HideOptions();
 
             favoritesSplitContainer.Panel1Collapsed = true;
+        }
+
+        ~MainForm()
+        {
+            m_RunTimer.Dispose();
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
@@ -178,6 +192,9 @@ namespace Batchery
             textProgressBar.ProgressColor = m_GoodColor;
             textProgressBar.Invalidate();
 
+            m_StartTime = DateTime.Now;
+            m_RunTimer.Start();
+
             m_batchManager.OnRun(onBatchRunEnd, onBatchRunFile, onStdOutRecieved, onStdErrRecieved, onStatusRecieved);
         }
 
@@ -195,12 +212,15 @@ namespace Batchery
             }
             else
             {
+                m_RunTimer.Stop();
+
                 if (exitCode == 0)
                 {
                     textProgressBar.Maximum = 1;
                     textProgressBar.Value = 1;
                     textProgressBar.ProgressColor = m_GoodColor;
-                    textProgressBar.CustomText = "Success!";
+                    m_progressBarTextWithoutTime = "Success!";
+                    UpdateProgressBarTextWithTime();
                     textProgressBar.Invalidate();
                 }
                 else
@@ -208,6 +228,7 @@ namespace Batchery
                     textProgressBar.Maximum = 1;
                     textProgressBar.Value = 1;
                     textProgressBar.ProgressColor = m_BadColor;
+                    UpdateProgressBarTextWithTime();
                     textProgressBar.Invalidate();
                 }
 
@@ -236,9 +257,10 @@ namespace Batchery
             }
             else
             {
-                textProgressBar.CustomText = "(" + stepIdx.ToString() + "/" + numSteps.ToString() + ") " + stepName;
+                m_progressBarTextWithoutTime = "(" + stepIdx.ToString() + "/" + numSteps.ToString() + ") " + stepName;
                 textProgressBar.Maximum = numSteps;
                 textProgressBar.Value = stepIdx;
+                UpdateProgressBarTextWithTime();
             }
         }
 
@@ -703,7 +725,7 @@ namespace Batchery
             if ((findPanel.Visible == false) && (runButton.Enabled == true))
             {
                 m_PreFindCurVisibleTextRtf = m_curVisibleTextBox.Rtf;
-                
+
                 findTextBox.Clear();
                 findPanel.Enabled = true;
                 findPanel.Visible = true;
@@ -830,14 +852,14 @@ namespace Batchery
             findPrevButton.Enabled = true;
         }
 
-        
+
         private void findNextButton_Click(object sender, EventArgs e)
         {
             int index = -1;
             if ((m_curVisibleTextBox.SelectionStart + findTextBox.TextLength) < m_curVisibleTextBox.TextLength)
             {
                 index = m_curVisibleTextBox.Find(findTextBox.Text, m_curVisibleTextBox.SelectionStart + findTextBox.TextLength, -1, RichTextBoxFinds.None);
-            }    
+            }
 
             if (index < 0)
             {
@@ -876,7 +898,7 @@ namespace Batchery
             }
             else
             {
-                findCountLabel.Text = String.Format("{0:n0}/{1:n0}", (m_CurrentFind+1).ToString(), m_TotalFinds.ToString());
+                findCountLabel.Text = String.Format("{0:n0}/{1:n0}", (m_CurrentFind + 1).ToString(), m_TotalFinds.ToString());
             }
         }
 
@@ -1026,6 +1048,17 @@ namespace Batchery
         {
             BatchItem selectedItem = (BatchItem)batchCheckedListBox.SelectedItem;
             selectedItem.AbortOnNonZeroExitCode = abortOnNonZeroCheckBox.Checked;
+        }
+
+        private void UpdateProgressBarTextWithTime()
+        {
+            TimeSpan runTime = DateTime.Now - m_StartTime;
+            textProgressBar.CustomText = runTime.ToString(@"mm\:ss") + " - " + m_progressBarTextWithoutTime;
+        }
+
+        private void OnRunTimerTick(object sender, EventArgs e)
+        {
+            UpdateProgressBarTextWithTime();
         }
     }
 }
