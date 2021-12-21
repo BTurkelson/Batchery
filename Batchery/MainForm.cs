@@ -928,6 +928,7 @@ namespace Batchery
                         }
 
                         openFileDialog.Multiselect = false;
+                        openFileDialog.InitialDirectory = System.IO.Path.GetDirectoryName(textBox.Text);
                         openFileDialog.CheckFileExists = true;
 
                         if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -940,7 +941,9 @@ namespace Batchery
                     {
                         System.Windows.Forms.FolderBrowserDialog folderDialog = new System.Windows.Forms.FolderBrowserDialog();
                         folderDialog.Description = "Working Directory";
-                        
+
+                        folderDialog.SelectedPath = textBox.Text + "\\";
+
                         if (folderDialog.ShowDialog() == DialogResult.OK)
                         {
                             textBox.Text = folderDialog.SelectedPath;
