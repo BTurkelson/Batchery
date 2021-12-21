@@ -243,7 +243,7 @@ namespace Batchery
             this.findTextBox.Location = new System.Drawing.Point(4, 4);
             this.findTextBox.Name = "findTextBox";
             this.findTextBox.PlaceholderText = "Find...";
-            this.findTextBox.Size = new System.Drawing.Size(493, 18);
+            this.findTextBox.Size = new System.Drawing.Size(486, 18);
             this.findTextBox.TabIndex = 0;
             this.findTextBox.TextChanged += new System.EventHandler(this.OnFindTextChanged);
             // 
@@ -253,12 +253,12 @@ namespace Batchery
             this.findCountLabel.AutoSize = true;
             this.findCountLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.findCountLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.findCountLabel.Location = new System.Drawing.Point(503, 5);
+            this.findCountLabel.Location = new System.Drawing.Point(494, 5);
             this.findCountLabel.MinimumSize = new System.Drawing.Size(55, 0);
             this.findCountLabel.Name = "findCountLabel";
-            this.findCountLabel.Size = new System.Drawing.Size(55, 17);
+            this.findCountLabel.Size = new System.Drawing.Size(69, 17);
             this.findCountLabel.TabIndex = 4;
-            this.findCountLabel.Text = "999/999";
+            this.findCountLabel.Text = "9999/9999";
             this.findCountLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // textProgressBar
@@ -1145,7 +1145,7 @@ namespace Batchery
             // 
             // findTimer
             // 
-            this.findTimer.Interval = 250;
+            this.findTimer.Interval = 500;
             this.findTimer.Tick += new System.EventHandler(this.OnFindTimerTick);
             // 
             // MainForm
