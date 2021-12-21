@@ -36,6 +36,14 @@ namespace Batchery
 
         private bool m_OptionsShown = true;
 
+        enum OptionsBrowseButtonsEnum
+        {
+            FilePath,
+            WorkingDir,
+            Editor,
+            FileToEdit,
+        }
+
         enum MainTabControlIndices : int
         {
             Output = 0,
@@ -74,11 +82,27 @@ namespace Batchery
             m_batchManager = new BatchManager(batchCheckedListBox);
 
             HideOptions();
+
+            favoritesSplitContainer.Panel1Collapsed = true;
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
-            if ((e.Control) && (e.KeyCode == Keys.F) && (findPanel.Visible == false))
+            if ((e.KeyCode == Keys.F5) && (runButton.Enabled))
+            {
+                mainTabControl.SelectTab((int)MainTabControlIndices.Output);
+                runButton.PerformClick();
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+            else if ((e.KeyCode == Keys.Escape) && (cancelButton.Enabled))
+            {
+                mainTabControl.SelectTab((int)MainTabControlIndices.Output);
+                cancelButton.PerformClick();
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+            else if ((e.Control) && (e.KeyCode == Keys.F) && (findPanel.Visible == false))
             {
                 if (mainTabControl.SelectedIndex == (int)MainTabControlIndices.Output)
                 {
@@ -173,9 +197,10 @@ namespace Batchery
             {
                 if (exitCode == 0)
                 {
-                    textProgressBar.Value = 0;
+                    textProgressBar.Maximum = 1;
+                    textProgressBar.Value = 1;
                     textProgressBar.ProgressColor = m_GoodColor;
-                    textProgressBar.CustomText = "";
+                    textProgressBar.CustomText = "Success!";
                     textProgressBar.Invalidate();
                 }
                 else
@@ -212,8 +237,8 @@ namespace Batchery
             else
             {
                 textProgressBar.CustomText = "(" + stepIdx.ToString() + "/" + numSteps.ToString() + ") " + stepName;
-                textProgressBar.Value = stepIdx;
                 textProgressBar.Maximum = numSteps;
+                textProgressBar.Value = stepIdx;
             }
         }
 
@@ -597,6 +622,7 @@ namespace Batchery
 
             //Actions
             bool validItemHighlighted = ((batchCheckedListBox.Items.Count > 0) && (batchCheckedListBox.SelectedItem != null));
+            BatchItem selectedItem = (BatchItem)batchCheckedListBox.SelectedItem;
 
             removeButton.Enabled = validItemHighlighted;
             contextMenuStrip2.Items[(int)ContextMenu2Indices.Remove].Enabled = validItemHighlighted;
@@ -609,16 +635,46 @@ namespace Batchery
 
             // Item 7 is a separator
 
-            editButton.Enabled = validItemHighlighted;
-            contextMenuStrip2.Items[(int)ContextMenu2Indices.Edit].Enabled = validItemHighlighted;
+            bool editEnabled = validItemHighlighted && System.IO.File.Exists(selectedItem.Editor) && System.IO.File.Exists(selectedItem.FileToEdit);
+            editButton.Enabled = editEnabled;
+            contextMenuStrip2.Items[(int)ContextMenu2Indices.Edit].Enabled = editEnabled;
 
             optionsButton.Enabled = validItemHighlighted;
             contextMenuStrip2.Items[(int)ContextMenu2Indices.Options].Enabled = validItemHighlighted;
 
-            if ((validItemHighlighted == false) && (m_OptionsShown))
+            if (validItemHighlighted == false)
             {
-                HideOptions();
+                ClearOptions();
             }
+            else
+            {
+                SetOptions(selectedItem);
+            }
+        }
+        private void ClearOptions()
+        {
+            optionsTableLayout.Enabled = false;
+            displayNameTextBox.Clear();
+            filePathTextBox.Clear();
+            workingDirTextBox.Clear();
+            argsTextBox.Clear();
+            iterationsUpDown.Value = 1;
+            abortOnNonZeroCheckBox.Checked = false;
+            editorTextBox.Clear();
+            fileToEditTextBox.Clear();
+        }
+
+        private void SetOptions(BatchItem item)
+        {
+            displayNameTextBox.Text = item.DisplayName;
+            filePathTextBox.Text = item.FilePath;
+            workingDirTextBox.Text = item.WorkingDirectory;
+            argsTextBox.Text = item.Arguments;
+            iterationsUpDown.Value = item.Iterations;
+            abortOnNonZeroCheckBox.Checked = item.AbortOnNonZeroExitCode;
+            editorTextBox.Text = item.Editor;
+            fileToEditTextBox.Text = item.FileToEdit;
+            optionsTableLayout.Enabled = true;
         }
 
         private void LinkClicked(object sender, System.Windows.Forms.LinkClickedEventArgs e)
@@ -850,6 +906,123 @@ namespace Batchery
             batchSplitContainer.Panel2Collapsed = false;
             optionsButton.Text = "Hide Options";
             contextMenuStrip2.Items[(int)ContextMenu2Indices.Options].Text = "Hide Options";
+        }
+
+        private void OnOptionsBrowseButtonClick(OptionsBrowseButtonsEnum whichButton, System.Windows.Forms.TextBox textBox)
+        {
+            switch (whichButton)
+            {
+                case OptionsBrowseButtonsEnum.FilePath:
+                case OptionsBrowseButtonsEnum.Editor:
+                case OptionsBrowseButtonsEnum.FileToEdit:
+                    {
+                        System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
+
+                        if (whichButton != OptionsBrowseButtonsEnum.Editor)
+                        {
+                            openFileDialog.Filter = "Batch files (*.bat)|*.bat|Command Files (*.cmd)|*.cmd|Executable Files (*.exe)|*.exe|All files (*.*)|*.*";
+                        }
+                        else
+                        {
+                            openFileDialog.Filter = "Executable Files (*.exe)|*.exe|All files (*.*)|*.*";
+                        }
+
+                        openFileDialog.Multiselect = false;
+                        openFileDialog.CheckFileExists = true;
+
+                        if (openFileDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            textBox.Text = openFileDialog.FileName;
+                        }
+                    }
+                    break;
+                case OptionsBrowseButtonsEnum.WorkingDir:
+                    {
+                        System.Windows.Forms.FolderBrowserDialog folderDialog = new System.Windows.Forms.FolderBrowserDialog();
+                        folderDialog.Description = "Working Directory";
+                        
+                        if (folderDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            textBox.Text = folderDialog.SelectedPath;
+                        }
+                    }
+                    break;
+                default:
+                    throw (new Exception("Unknown Options Button Type"));
+            }
+        }
+
+        private void filePathBrowseButton_Click(object sender, EventArgs e)
+        {
+            bool setFileToEditAlso = (filePathTextBox.Text == fileToEditTextBox.Text);
+            OnOptionsBrowseButtonClick(OptionsBrowseButtonsEnum.FilePath, filePathTextBox);
+
+            BatchItem selectedItem = (BatchItem)batchCheckedListBox.SelectedItem;
+            selectedItem.FilePath = filePathTextBox.Text;
+
+            if (setFileToEditAlso && BatchItem.IsTextFile(fileToEditTextBox.Text))
+            {
+                fileToEditTextBox.Text = filePathTextBox.Text;
+                selectedItem.FileToEdit = fileToEditTextBox.Text;
+            }
+        }
+
+        private void workingDirBrowseButton_Click(object sender, EventArgs e)
+        {
+            OnOptionsBrowseButtonClick(OptionsBrowseButtonsEnum.WorkingDir, workingDirTextBox);
+
+            BatchItem selectedItem = (BatchItem)batchCheckedListBox.SelectedItem;
+            selectedItem.WorkingDirectory = workingDirTextBox.Text;
+        }
+
+        private void editorBrowseButton_Click(object sender, EventArgs e)
+        {
+            OnOptionsBrowseButtonClick(OptionsBrowseButtonsEnum.Editor, editorTextBox);
+
+            BatchItem selectedItem = (BatchItem)batchCheckedListBox.SelectedItem;
+            selectedItem.Editor = editorTextBox.Text;
+        }
+
+        private void fileToEditBrowseButton_Click(object sender, EventArgs e)
+        {
+            OnOptionsBrowseButtonClick(OptionsBrowseButtonsEnum.FileToEdit, fileToEditTextBox);
+
+            BatchItem selectedItem = (BatchItem)batchCheckedListBox.SelectedItem;
+            selectedItem.FileToEdit = fileToEditTextBox.Text;
+        }
+
+        private void OnDisplayNameTextBoxLeave(object sender, EventArgs e)
+        {
+            BatchItem selectedItem = (BatchItem)batchCheckedListBox.SelectedItem;
+
+            string trimmed = displayNameTextBox.Text.Trim();
+            if (trimmed.Length == 0)
+            {
+                trimmed = "<" + System.IO.Path.GetFileNameWithoutExtension(selectedItem.FilePath) + ">";
+            }
+
+            selectedItem.DisplayName = trimmed;
+            displayNameTextBox.Text = trimmed;
+        }
+
+        private void OnArgsTextBoxLeave(object sender, EventArgs e)
+        {
+            BatchItem selectedItem = (BatchItem)batchCheckedListBox.SelectedItem;
+            string trimmed = argsTextBox.Text.Trim();
+            selectedItem.Arguments = trimmed;
+            argsTextBox.Text = trimmed;
+        }
+
+        private void OnIterationsNumUpDownLeave(object sender, EventArgs e)
+        {
+            BatchItem selectedItem = (BatchItem)batchCheckedListBox.SelectedItem;
+            selectedItem.Iterations = ((int)iterationsUpDown.Value);
+        }
+
+        private void OnAbortOnNonZeroCheckboxLeave(object sender, EventArgs e)
+        {
+            BatchItem selectedItem = (BatchItem)batchCheckedListBox.SelectedItem;
+            selectedItem.AbortOnNonZeroExitCode = abortOnNonZeroCheckBox.Checked;
         }
     }
 }
