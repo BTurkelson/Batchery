@@ -151,6 +151,9 @@ namespace Batchery
 
         private void OnProcess_Exited(object sender, EventArgs e)
         {
+            // Process has exited; call this to wait for the output to all be processed.
+            m_BatchProcess.WaitForExit();
+
             m_BatchProcess.CancelOutputRead();
             m_BatchProcess.CancelErrorRead();
 
