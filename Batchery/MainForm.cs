@@ -493,6 +493,7 @@ namespace Batchery
             SessionSettings.Default.DetectWarnings = detectWarningsCheckBox.Checked;
             SessionSettings.Default.DetectFindResults = detectFindResultsCheckBox.Checked;
             SessionSettings.Default.InjectBatcheryOutput = injectBatcheryOutputCheckBox.Checked;
+            SessionSettings.Default.AdvancedPathEditing = advancedPathEditingCheckBox.Checked;
             m_batchManager.SaveToSettings();
             SessionSettings.Default.Save();
         }
@@ -506,6 +507,7 @@ namespace Batchery
             detectWarningsCheckBox.Checked = SessionSettings.Default.DetectWarnings;
             detectFindResultsCheckBox.Checked = SessionSettings.Default.DetectFindResults;
             injectBatcheryOutputCheckBox.Checked = SessionSettings.Default.InjectBatcheryOutput;
+            advancedPathEditingCheckBox.Checked = SessionSettings.Default.AdvancedPathEditing;
 
             UpdateFindCountDisplay();
 
@@ -1066,6 +1068,34 @@ namespace Batchery
         private void OnRunTimerTick(object sender, EventArgs e)
         {
             UpdateProgressBarTextWithTime();
+        }
+
+        private void advancedPathEditingCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (advancedPathEditingCheckBox.Checked == false)
+            {
+                filePathTextBox.ReadOnly = true;
+                workingDirTextBox.ReadOnly = true;
+                editorTextBox.ReadOnly = true;
+                fileToEditTextBox.ReadOnly = true;
+
+                filePathTextBox.AutoCompleteMode = AutoCompleteMode.Suggest;
+                workingDirTextBox.AutoCompleteMode = AutoCompleteMode.Suggest;
+                editorTextBox.AutoCompleteMode = AutoCompleteMode.Suggest;
+                fileToEditTextBox.AutoCompleteMode = AutoCompleteMode.Suggest;
+            }
+            else
+            {
+                filePathTextBox.ReadOnly = false;
+                workingDirTextBox.ReadOnly = false;
+                editorTextBox.ReadOnly = false;
+                fileToEditTextBox.ReadOnly = false;
+
+                filePathTextBox.AutoCompleteMode = AutoCompleteMode.None;
+                workingDirTextBox.AutoCompleteMode = AutoCompleteMode.None;
+                editorTextBox.AutoCompleteMode = AutoCompleteMode.None;
+                fileToEditTextBox.AutoCompleteMode = AutoCompleteMode.None;
+            }
         }
     }
 }
