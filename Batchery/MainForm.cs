@@ -693,6 +693,7 @@ namespace Batchery
             abortOnNonZeroCheckBox.Checked = false;
             editorTextBox.Clear();
             fileToEditTextBox.Clear();
+            disableOnSuccessCheckBox.Checked = false;
         }
 
         private void SetOptions(BatchItem item)
@@ -706,6 +707,7 @@ namespace Batchery
             editorTextBox.Text = item.Editor;
             fileToEditTextBox.Text = item.FileToEdit;
             optionsTableLayout.Enabled = true;
+            disableOnSuccessCheckBox.Checked = item.DisableOnSuccess;
         }
 
         private void LinkClicked(object sender, System.Windows.Forms.LinkClickedEventArgs e)
@@ -1057,6 +1059,11 @@ namespace Batchery
         {
             BatchItem selectedItem = (BatchItem)batchCheckedListBox.SelectedItem;
             selectedItem.AbortOnNonZeroExitCode = abortOnNonZeroCheckBox.Checked;
+        }
+        private void OnDisableOnSuccessCheckboxLeave(object sender, EventArgs e)
+        {
+            BatchItem selectedItem = (BatchItem)batchCheckedListBox.SelectedItem;
+            selectedItem.DisableOnSuccess = disableOnSuccessCheckBox.Checked;
         }
 
         private void UpdateProgressBarTextWithTime()

@@ -154,8 +154,16 @@ namespace Batchery
             // Process has exited; call this to wait for the output to all be processed.
             m_BatchProcess.WaitForExit();
 
-            m_BatchProcess.CancelOutputRead();
-            m_BatchProcess.CancelErrorRead();
+            try
+            {
+                m_BatchProcess.CancelOutputRead();
+                m_BatchProcess.CancelErrorRead();
+            }
+            catch(Exception)
+            {
+                // Okay if these fail.
+            }
+
 
             m_stepStopwatch.Stop();
             TimeSpan elapsedTime = m_stepStopwatch.Elapsed;
@@ -166,6 +174,14 @@ namespace Batchery
             {
                 exitCode = m_BatchProcess.ExitCode;
                 OnStatus("Exited in " + elapsedTimeString + " with code: " + m_BatchProcess.ExitCode, (exitCode != 0));
+            }
+
+            if (m_RunningTuple.Item2 == (m_RunningTuple.Item1.Iterations - 1))
+            {
+                if ((m_RunningTuple.Item1.DisableOnSuccess) && ((exitCode == 0) || (m_RunningTuple.Item1.AbortOnNonZeroExitCode == false)))
+                {
+                    UncheckItem(m_RunningTuple.Item1);
+                }
             }
 
             bool endNow = true;
@@ -181,15 +197,33 @@ namespace Batchery
                     OnStatus("Aborting due to nonzero exit code", true);
                 }
             }
-            
-            if ((endNow == true) && (m_onEndCallback != null))
-            {
-                OnEndCallback temp = m_onEndCallback;
-                ClearCallbacks();
-                temp(exitCode);
-            }
 
-            m_RunningTuple = (null, 0);
+            if (endNow == true)
+            {
+                m_RunningTuple = (null, 0);
+                if (m_onEndCallback != null)
+                {
+                    OnEndCallback temp = m_onEndCallback;
+                    ClearCallbacks();
+                    temp(exitCode);
+                }
+            }
+        }
+        private void UncheckItem(BatchItem item)
+        {
+            if (m_listBox.InvokeRequired)
+            {
+                m_listBox.Invoke(new Action<BatchItem>(UncheckItem), item);
+            }
+            else
+            {
+                m_suspendBatchListItemCheck = true;
+
+                m_RunningTuple.Item1.IsChecked = false;
+                m_listBox.SetItemChecked(m_listBox.Items.IndexOf(m_RunningTuple.Item1), false);
+
+                m_suspendBatchListItemCheck = false;
+            }
         }
 
         public void OnCancel()
