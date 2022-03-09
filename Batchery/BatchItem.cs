@@ -15,6 +15,7 @@ namespace Batchery
 		public string Editor { get; set; }
 		public string FileToEdit { get; set; }
 		public bool IsChecked { get; set; }
+		public bool DisableOnSuccess { get; set; }
 
 		public BatchItem(string baseFilePath)
 		{
