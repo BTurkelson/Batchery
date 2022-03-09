@@ -72,6 +72,8 @@ namespace Batchery
             this.editInNotepadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsTableLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.disableOnSuccessCheckBox = new System.Windows.Forms.CheckBox();
+            this.disableOnSuccessLabel = new System.Windows.Forms.Label();
             this.fileToEditBrowseButton = new System.Windows.Forms.Button();
             this.editorBrowseButton = new System.Windows.Forms.Button();
             this.fileToEditTextBox = new System.Windows.Forms.TextBox();
@@ -111,6 +113,8 @@ namespace Batchery
             this.detectFindResultsLabel = new System.Windows.Forms.Label();
             this.injectBatcheryOutputCheckBox = new System.Windows.Forms.CheckBox();
             this.injectBatcheryOutputLabel = new System.Windows.Forms.Label();
+            this.advancedPathEditingCheckBox = new System.Windows.Forms.CheckBox();
+            this.advancedPathEditingLabel = new System.Windows.Forms.Label();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.findTimer = new System.Windows.Forms.Timer(this.components);
@@ -515,7 +519,7 @@ namespace Batchery
             this.batchSplitContainer.Panel2MinSize = 243;
             this.tableLayoutPanel2.SetRowSpan(this.batchSplitContainer, 2);
             this.batchSplitContainer.Size = new System.Drawing.Size(574, 349);
-            this.batchSplitContainer.SplitterDistance = 106;
+            this.batchSplitContainer.SplitterDistance = 76;
             this.batchSplitContainer.TabIndex = 7;
             // 
             // batchCheckedListBox
@@ -528,7 +532,7 @@ namespace Batchery
             this.batchCheckedListBox.Location = new System.Drawing.Point(0, 0);
             this.batchCheckedListBox.Name = "batchCheckedListBox";
             this.batchCheckedListBox.ScrollAlwaysVisible = true;
-            this.batchCheckedListBox.Size = new System.Drawing.Size(574, 106);
+            this.batchCheckedListBox.Size = new System.Drawing.Size(574, 76);
             this.batchCheckedListBox.TabIndex = 1;
             this.batchCheckedListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.batchList_ItemCheck);
             this.batchCheckedListBox.SelectedIndexChanged += new System.EventHandler(this.batchList_SelectedIndexChanged);
@@ -629,6 +633,8 @@ namespace Batchery
             this.optionsTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 128F));
             this.optionsTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.optionsTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
+            this.optionsTableLayout.Controls.Add(this.disableOnSuccessCheckBox, 1, 8);
+            this.optionsTableLayout.Controls.Add(this.disableOnSuccessLabel, 0, 8);
             this.optionsTableLayout.Controls.Add(this.fileToEditBrowseButton, 2, 7);
             this.optionsTableLayout.Controls.Add(this.editorBrowseButton, 2, 6);
             this.optionsTableLayout.Controls.Add(this.fileToEditTextBox, 1, 7);
@@ -662,8 +668,30 @@ namespace Batchery
             this.optionsTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.optionsTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.optionsTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.optionsTableLayout.Size = new System.Drawing.Size(574, 239);
+            this.optionsTableLayout.Size = new System.Drawing.Size(574, 269);
             this.optionsTableLayout.TabIndex = 0;
+            // 
+            // disableOnSuccessCheckBox
+            // 
+            this.disableOnSuccessCheckBox.AutoSize = true;
+            this.disableOnSuccessCheckBox.Dock = System.Windows.Forms.DockStyle.Left;
+            this.disableOnSuccessCheckBox.Location = new System.Drawing.Point(131, 243);
+            this.disableOnSuccessCheckBox.Name = "disableOnSuccessCheckBox";
+            this.disableOnSuccessCheckBox.Size = new System.Drawing.Size(15, 23);
+            this.disableOnSuccessCheckBox.TabIndex = 21;
+            this.disableOnSuccessCheckBox.UseVisualStyleBackColor = true;
+            this.disableOnSuccessCheckBox.Leave += new System.EventHandler(this.OnDisableOnSuccessCheckboxLeave);
+            // 
+            // disableOnSuccessLabel
+            // 
+            this.disableOnSuccessLabel.AutoSize = true;
+            this.disableOnSuccessLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.disableOnSuccessLabel.Location = new System.Drawing.Point(3, 240);
+            this.disableOnSuccessLabel.Name = "disableOnSuccessLabel";
+            this.disableOnSuccessLabel.Size = new System.Drawing.Size(122, 29);
+            this.disableOnSuccessLabel.TabIndex = 20;
+            this.disableOnSuccessLabel.Text = "Disable On Success";
+            this.disableOnSuccessLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // fileToEditBrowseButton
             // 
@@ -696,6 +724,7 @@ namespace Batchery
             this.fileToEditTextBox.ReadOnly = true;
             this.fileToEditTextBox.Size = new System.Drawing.Size(320, 23);
             this.fileToEditTextBox.TabIndex = 17;
+            this.fileToEditTextBox.WordWrap = false;
             // 
             // editorTextBox
             // 
@@ -706,6 +735,7 @@ namespace Batchery
             this.editorTextBox.ReadOnly = true;
             this.editorTextBox.Size = new System.Drawing.Size(320, 23);
             this.editorTextBox.TabIndex = 16;
+            this.editorTextBox.WordWrap = false;
             // 
             // fileToEditLabel
             // 
@@ -804,6 +834,7 @@ namespace Batchery
             this.filePathTextBox.ReadOnly = true;
             this.filePathTextBox.Size = new System.Drawing.Size(320, 23);
             this.filePathTextBox.TabIndex = 7;
+            this.filePathTextBox.WordWrap = false;
             // 
             // workingDirTextBox
             // 
@@ -814,6 +845,7 @@ namespace Batchery
             this.workingDirTextBox.ReadOnly = true;
             this.workingDirTextBox.Size = new System.Drawing.Size(320, 23);
             this.workingDirTextBox.TabIndex = 8;
+            this.workingDirTextBox.WordWrap = false;
             // 
             // argsTextBox
             // 
@@ -823,6 +855,7 @@ namespace Batchery
             this.argsTextBox.Name = "argsTextBox";
             this.argsTextBox.Size = new System.Drawing.Size(440, 23);
             this.argsTextBox.TabIndex = 9;
+            this.argsTextBox.WordWrap = false;
             this.argsTextBox.Leave += new System.EventHandler(this.OnArgsTextBoxLeave);
             // 
             // iterationsUpDown
@@ -1024,9 +1057,12 @@ namespace Batchery
             this.settingsTableLayout.Controls.Add(this.detectFindResultsLabel, 1, 3);
             this.settingsTableLayout.Controls.Add(this.injectBatcheryOutputCheckBox, 0, 4);
             this.settingsTableLayout.Controls.Add(this.injectBatcheryOutputLabel, 1, 4);
+            this.settingsTableLayout.Controls.Add(this.advancedPathEditingCheckBox, 0, 5);
+            this.settingsTableLayout.Controls.Add(this.advancedPathEditingLabel, 1, 5);
             this.settingsTableLayout.Location = new System.Drawing.Point(19, 19);
             this.settingsTableLayout.Name = "settingsTableLayout";
-            this.settingsTableLayout.RowCount = 6;
+            this.settingsTableLayout.RowCount = 7;
+            this.settingsTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.settingsTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.settingsTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.settingsTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
@@ -1138,6 +1174,26 @@ namespace Batchery
             this.injectBatcheryOutputLabel.Size = new System.Drawing.Size(161, 15);
             this.injectBatcheryOutputLabel.TabIndex = 9;
             this.injectBatcheryOutputLabel.Text = "Inject Batchery Status Output";
+            // 
+            // advancedPathEditingCheckBox
+            // 
+            this.advancedPathEditingCheckBox.AutoSize = true;
+            this.advancedPathEditingCheckBox.Location = new System.Drawing.Point(3, 103);
+            this.advancedPathEditingCheckBox.Name = "advancedPathEditingCheckBox";
+            this.advancedPathEditingCheckBox.Size = new System.Drawing.Size(14, 14);
+            this.advancedPathEditingCheckBox.TabIndex = 10;
+            this.advancedPathEditingCheckBox.Text = "checkBox1";
+            this.advancedPathEditingCheckBox.UseVisualStyleBackColor = true;
+            this.advancedPathEditingCheckBox.CheckedChanged += new System.EventHandler(this.advancedPathEditingCheckBox_CheckedChanged);
+            // 
+            // advancedPathEditingLabel
+            // 
+            this.advancedPathEditingLabel.AutoSize = true;
+            this.advancedPathEditingLabel.Location = new System.Drawing.Point(23, 100);
+            this.advancedPathEditingLabel.Name = "advancedPathEditingLabel";
+            this.advancedPathEditingLabel.Size = new System.Drawing.Size(127, 15);
+            this.advancedPathEditingLabel.TabIndex = 11;
+            this.advancedPathEditingLabel.Text = "Advanced Path Editing";
             // 
             // openFileDialog1
             // 
@@ -1277,6 +1333,10 @@ namespace Batchery
         private System.Windows.Forms.TextBox editorTextBox;
         private System.Windows.Forms.Label fileToEditLabel;
         private System.Windows.Forms.Label editorLabel;
+        private System.Windows.Forms.CheckBox advancedPathEditingCheckBox;
+        private System.Windows.Forms.Label advancedPathEditingLabel;
+        private System.Windows.Forms.CheckBox disableOnSuccessCheckBox;
+        private System.Windows.Forms.Label disableOnSuccessLabel;
     }
 }
 

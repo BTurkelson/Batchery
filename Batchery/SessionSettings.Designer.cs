@@ -118,5 +118,17 @@ namespace Batchery {
                 this["DetectFindResults"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AdvancedPathEditing {
+            get {
+                return ((bool)(this["AdvancedPathEditing"]));
+            }
+            set {
+                this["AdvancedPathEditing"] = value;
+            }
+        }
     }
 }
